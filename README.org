@@ -8,12 +8,12 @@
 :TOC:      :include all :ignore this
 :END:
 :CONTENTS:
-- [[Early Init]]
-- [[Garbage Collection]]
-- [[Native Compil]]
-- [[Functions]]
-- [[Package Management]]
-- [[Base Config]]
+- [[#early-init][Early Init]]
+- [[#garbage-collection][Garbage Collection]]
+- [[#native-compil][Native Compil]]
+- [[#functions][Functions]]
+- [[#package-management][Package Management ]]
+- [[#base-config][Base Config]]
 - [[Theme]]
 - [[Icons]]
 - [[Dashboard]]
