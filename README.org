@@ -1,51 +1,51 @@
 #+title: Emacs Config
-#+property: header-args:emacs-lisp :tangle init.el
+#+property: header-args:emacs-lisp :tangle ~/.emacs.d/init.el
 
 * Early Init
 ** Garbage collection at startup
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
 (setq gc-cons-threshold 100000000)
 #+end_src
 
 ** Disable package-enable-at-startup
 Package initialize occurs automatically, before user-init-file is loaded, but after early-init-file. We handle package initialization, so we must prevent Emacs from doing it early!
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
 (setq package-enable-at-startup nil)
 #+end_src
 
 ** Unset file-name-handler-alist
 Every file opened and loaded by Emacs will run through this list to check for a proper handler for the file, but during startup, it won’t need any of them.
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
 (defvar file-name-handler-alist-original file-name-handler-alist)
 (setq file-name-handler-alist nil)
 #+end_src
 
 ** Disable site-run-file
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
 (setq site-run-file nil)
 #+end_src
 
 ** Disable backup files
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
 (setq make-backup-files nil)
 #+end_src
 
 ** Disable screen jump
 When the cursor moves out of the screen
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
 (setq scroll-conservatively 101)
 #+end_src
 
 ** Disable Unnecessary Interface
 It will be faster to disable them here before they've been initialized.
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
