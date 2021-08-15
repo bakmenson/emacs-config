@@ -3,6 +3,43 @@
 #+property: header-args :mkdirp yes
 #+property: header-args:emacs-lisp :tangle ~/.emacs.d/init.el :tangle-mode (identity #o555)
 
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all :ignore this
+:END:
+:CONTENTS:
+- [[Early Init]]
+- [[Garbage Collection]]
+- [[Native Compil]]
+- [[Functions]]
+- [[Package Management]]
+- [[Base Config]]
+- [[Theme]]
+- [[Icons]]
+- [[Dashboard]]
+- [[Modeline]]
+- [[Which-Key]]
+- [[General Keybindings]]
+- [[Sudo Edit]]
+- [[Evil]]
+- [[Dired]]
+- [[Files]]
+- [[Workspaces]]
+- [[Org]]
+- [[Vertico]]
+- [[Terminal]]
+- [[Git]]
+- [[Company]]
+- [[Projectile]]
+- [[Yasnippet]]
+- [[Dap]]
+- [[LSP]]
+- [[Python]]
+- [[Rust]]
+- [[Java]]
+- [[Flycheck]]
+
+
 * Early Init
 ** Garbage collection at startup
 
