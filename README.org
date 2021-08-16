@@ -1,7 +1,7 @@
 #+title: Emacs Config
 
 #+property: header-args :mkdirp yes
-#+property: header-args:emacs-lisp :tangle ~/.emacs.d/init.el :tangle-mode (identity #o555)
+#+property: header-args:emacs-lisp :tangle-mode (identity #o555)
 
 * Table of Contents
 :PROPERTIES:
@@ -99,7 +99,7 @@ and stuttering during long-term interactive use.
 
 *** The default value to use for `gc-cons-threshold'. If you experience freezing, decrease this.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (defvar better-gc-cons-threshold 134217728) ; 128mb
 
 (add-hook 'emacs-startup-hook
@@ -111,7 +111,7 @@ and stuttering during long-term interactive use.
 
 *** Garbage Collect when Emacs is out of focus and avoid garbage collection when using minibuffer.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (add-hook 'emacs-startup-hook
             (lambda ()
             (if (boundp 'after-focus-change-function)
@@ -136,7 +136,7 @@ and stuttering during long-term interactive use.
 
 Silence compiler warnings as they can be pretty disruptive
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (if (boundp 'comp-deferred-compilation)
     (setq comp-deferred-compilation nil)
     (setq native-comp-deferred-compilation nil))
@@ -148,14 +148,14 @@ Silence compiler warnings as they can be pretty disruptive
   prevent the use of stale byte-code. Otherwise, it saves us a little IO time
   to skip the mtime checks on every *.elc file.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq load-prefer-newer noninteractive)
 #+end_src
   
 * Functions
 ** Toggle Transparency
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (defun toggle-transparency ()
     (interactive)
     (let ((alpha (frame-parameter nil 'alpha)))
@@ -172,7 +172,7 @@ Silence compiler warnings as they can be pretty disruptive
 * Package Management
 ** Setup package archives
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (require 'package)
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -182,7 +182,7 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Configure Package Manager
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (package-initialize)
 
 (unless package-archive-contents
@@ -191,7 +191,7 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Install use-packageo
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (unless (package-installed-p 'use-package)
     (package-install 'use-package))
 
@@ -207,7 +207,7 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Auto Update
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package auto-package-update
     :if (not (daemonp))
     :custom
@@ -221,14 +221,14 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Diminish
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package diminish)
 #+end_src
 
 * Base Config
 ** Fonts
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (set-face-attribute 'default nil :font "JetBrains Mono" :height 105)
 (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :height 105)
 (set-face-attribute 'variable-pitch nil :font "JetBrains Mono" :height 105)
@@ -236,7 +236,7 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Cursor
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq-default evil-normal-state-cursor '(box "medium sea green")
               evil-insert-state-cursor '(bar "medium sea green")
               evil-visual-state-cursor '(hollow "orange")
@@ -245,7 +245,7 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Column Number
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (column-number-mode)
 
 ;; Enable line numbers for some modes
@@ -263,31 +263,31 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Parentheses
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (show-paren-mode 1)
 (electric-pair-mode 1)
 #+end_src
 
 ** Auto-revert
 *** Revert Dired and other buffers
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq global-auto-revert-non-file-buffers t)
 #+end_src
 
 *** Revert buffers when the underlying file has changed
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (global-auto-revert-mode 1)
 #+end_src
 
 ** Make ESC quit prompts
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+end_src
 
 ** Simplify Yes/No Prompts
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq use-dialog-box nil)
 #+end_src
@@ -295,7 +295,7 @@ Silence compiler warnings as they can be pretty disruptive
 ** Prettify Symbols
 Prettify symbols mode, a built-in mode for displaying sequences of characters as fancy characters or symbols.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (global-prettify-symbols-mode 1)
 (defun add-pretty-lambda ()
     "Make some word or string show as pretty Unicode symbols.  See https://unicodelookup.com for more."
@@ -313,7 +313,7 @@ Configurations to smooth scrolling.
 
 *** Vertical Scroll
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq scroll-step 1)
 (setq scroll-margin 1)
 (setq scroll-conservatively 101)
@@ -327,7 +327,7 @@ Configurations to smooth scrolling.
 
 *** Horizontal Scroll
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq hscroll-step 1)
 (setq hscroll-margin 1)
 #+end_src
@@ -340,7 +340,7 @@ Configurations to smooth scrolling.
 + 'doom-themes-treemacs-theme' - use "doom-colors" for less minimal icon theme
 + 'doom-themes-org-config' - Corrects (and improves) org-mode's native fontification.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package doom-themes
     :config
     (setq doom-themes-enable-bold t
@@ -355,7 +355,7 @@ Configurations to smooth scrolling.
 
 ** JetBrains Darcula
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 ;;(use-package jetbrains-darcula-theme
 ;;	:config
 ;;	(load-theme 'jetbrains-darcula t))
@@ -368,7 +368,7 @@ need to run the following command interactively so that mode line icons
 display correctly:
 M-x all-the-icons-install-fonts
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package all-the-icons)
 #+end_src
 
@@ -377,7 +377,7 @@ M-x all-the-icons-install-fonts
 
 An extensible emacs startup screen showing you what’s most important.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package dashboard
     :init
     (setq dashboard-banner-logo-title "Welcome to Emacs!")
@@ -398,13 +398,13 @@ An extensible emacs startup screen showing you what’s most important.
 
 This setting ensures that emacsclient always opens on dashboard rather than scratch.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 #+end_src
 
 * Modeline
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package doom-modeline
     :init (doom-modeline-mode 1)
     :custom
@@ -415,7 +415,7 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 * Which-Key
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package which-key
     :init
     (which-key-mode)
@@ -429,7 +429,7 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 * General Keybindings
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package general
     :init
     (setq-default general-override-states '(insert
@@ -552,7 +552,7 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 * Sudo Edit
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package sudo-edit
     :commands (sudo-edit))
 #+end_src
@@ -560,7 +560,7 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 * Evil
 ** undo-tree
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package undo-tree
     :config
     (global-undo-tree-mode))
@@ -568,13 +568,13 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 ** undo-fu
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package undo-fu)
 #+end_src
 
 ** evil
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package evil
     :init
     (setq evil-want-integration t)
@@ -589,7 +589,7 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 ** evil-collection
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package evil-collection
     :after evil
     :config
@@ -600,7 +600,7 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 Keep text selected after indentation
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (defun my/evil-shift-right ()
     (interactive)
     (evil-shift-right evil-visual-beginning evil-visual-end)
@@ -620,7 +620,7 @@ Keep text selected after indentation
 * Dired
 ** Rainbow
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package dired-rainbow
     :defer 2
     :config
@@ -648,14 +648,14 @@ Keep text selected after indentation
    
 ** Single
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package dired-single
     :defer t)
 #+end_src
   
 ** Map
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (evil-collection-define-key 'normal 'dired-mode-map
     "h" 'dired-single-up-directory
     "H" 'dired-omit-mode
@@ -664,7 +664,7 @@ Keep text selected after indentation
    
 ** Dired Icons
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package all-the-icons-dired
     :if (display-graphic-p)
     :hook (dired-mode . all-the-icons-dired-mode))
@@ -673,7 +673,7 @@ Keep text selected after indentation
 * Files
 ** Opening Files Externally
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package openwith
     :config
     (setq large-file-warning-threshold nil)
@@ -701,7 +701,7 @@ Keep text selected after indentation
 ** persp-mode
 + 'persp-modestring-short' - only displays the current perspective
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package perspective
     :demand t
     :custom
@@ -716,7 +716,7 @@ Keep text selected after indentation
 * Org
 ** Org-mode
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package org
     :hook (org-mode . (lambda ()
                         (org-indent-mode)
@@ -732,7 +732,7 @@ Keep text selected after indentation
 
 ** Superstar
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package org-superstar
     :after org
     :hook (org-mode . org-superstar-mode)
@@ -746,7 +746,7 @@ Keep text selected after indentation
 
 Increase the size of various *headings*
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (set-face-attribute 'org-document-title nil :font "JetBrains Mono" :weight 'bold :height 1.1)
 (dolist (face '((org-level-1 . 1.1)
                 (org-level-2 . 1.09)
@@ -762,7 +762,7 @@ Increase the size of various *headings*
 ** Org Indent
 Make sure org-indent face is available
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (require 'org-indent)
 
 ;; Ensure that anything that should be fixed-pitch in Org files appears that way
@@ -780,14 +780,14 @@ Make sure org-indent face is available
 ** Rid of the background
 Get rid of the background on column views
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (set-face-attribute 'org-column nil :background nil)
 (set-face-attribute 'org-column-title nil :background nil)
 #+end_src
 
 ** Visual Fill
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package visual-fill-column
     :hook (org-mode . (lambda ()
                         (setq visual-fill-column-width 120
@@ -798,7 +798,7 @@ Get rid of the background on column views
 
 ** Roam
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package org-roam
     :ensure t
     :init
@@ -814,13 +814,13 @@ Get rid of the background on column views
 ** Babel
 *** Confirm Evaluate
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq org-confirm-babel-evaluate nil)
 #+end_src
 
 *** Load languages
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . t)
@@ -833,7 +833,7 @@ Get rid of the background on column views
 + 'vertico-resize' - Grow and shrink the Vertico minibuffer.
 + 'vertico-cycle' - Optionally enable cycling for `vertico-next' and `vertico-previous'.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package vertico
     :init
     (vertico-mode)
@@ -844,7 +844,7 @@ Get rid of the background on column views
 
 ** Consult
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package consult)
 #+end_src
 
@@ -855,7 +855,7 @@ important for wildcard support. Multiple files can be opened at once
 with `find-file' if you enter a wildcard. You may also give the
 `initials' completion style a try.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package orderless
     :init
     (setq completion-styles '(orderless)
@@ -866,7 +866,7 @@ with `find-file' if you enter a wildcard. You may also give the
 ** Savehist
 Persist history over Emacs restarts. Vertico sorts by history position.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package savehist
     :init
     (savehist-mode))
@@ -877,7 +877,7 @@ A few more useful configurations.
 + 'completing-read-multiple' - Add prompt indicator
 + 'consult-completing-read-multiple' - Alternatively add prompt indicator
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package emacs
     :init
     (defun crm-indicator (args)
@@ -899,7 +899,7 @@ A few more useful configurations.
 
 ** Marginalia
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package marginalia
     :init
     (marginalia-mode))
@@ -908,20 +908,20 @@ A few more useful configurations.
 * Terminal
 ** Vterm
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package vterm)
 #+end_src
 
 * Git
 ** Magit
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package magit)
 #+end_src
 
 ** diff-hl
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package diff-hl
     :init
     (global-diff-hl-mode)
@@ -933,7 +933,7 @@ A few more useful configurations.
 * Company
 ** company
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package company
     :init
     (add-hook 'after-init-hook #'global-company-mode)
@@ -945,7 +945,7 @@ A few more useful configurations.
    
 ** company-shell
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package company-shell
     :after sh-script
     :custom (add-to-list 'company-backends 'company-shell))
@@ -953,14 +953,14 @@ A few more useful configurations.
    
 ** company-box
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package company-box
     :hook (company-mode . company-box-mode))
 #+end_src
    
 * Projectile
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package projectile
     :diminish projectile-mode
     :config (projectile-mode +1)
@@ -974,13 +974,13 @@ A few more useful configurations.
   
 * Yasnippet
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package yasnippet :config (yas-global-mode))
 #+end_src
   
 * Dap
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package dap-mode
     :diminish
     :bind
@@ -995,7 +995,7 @@ A few more useful configurations.
   
 * LSP
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package lsp-mode
     :init
     ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
@@ -1019,7 +1019,7 @@ A few more useful configurations.
 * Python
 ** python-mode
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package python-mode
     :custom
     (python-shell-interpreter "ipython"))
@@ -1027,7 +1027,7 @@ A few more useful configurations.
 
 ** lsp-pyright
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package lsp-pyright
     :ensure t
     :hook (python-mode . (lambda ()
@@ -1037,7 +1037,7 @@ A few more useful configurations.
 
 ** poetry
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package poetry
     :hook (python-mode . poetry-tracking-mode))
 #+end_src
@@ -1045,20 +1045,20 @@ A few more useful configurations.
 * Rust
 ** rust-mode
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package rust-mode)
 #+end_src
 
 ** cargo
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package cargo
     :hook ((rust-mode . cargo-minor-mode)))
 #+end_src
 
 * Java
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package meghanada
     :hook (java-mode . (lambda ()
                         (meghanada-mode t)
@@ -1073,7 +1073,7 @@ A few more useful configurations.
 * Flycheck
 ** flycheck
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package flycheck
     :config
     (add-to-list 'flycheck-check-syntax-automatically 'idle-change))
@@ -1081,7 +1081,7 @@ A few more useful configurations.
    
 ** flycheck-rust
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package flycheck-rust
     :after (rust-mode)
     :hook ((flycheck-mode . flycheck-rust-setup))
