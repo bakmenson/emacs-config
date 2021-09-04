@@ -735,23 +735,6 @@ Keep text selected after indentation
 )
 #+end_src
 
-** Size
-
-Increase the size of various *headings*
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(set-face-attribute 'org-document-title nil :font "JetBrains Mono" :weight 'bold :height 1.1)
-(dolist (face '((org-level-1 . 1.1)
-                (org-level-2 . 1.09)
-                (org-level-3 . 1.09)
-                (org-level-4 . 1.08)
-                (org-level-5 . 1.07)
-                (org-level-6 . 1.06)
-                (org-level-7 . 1.05)
-                (org-level-8 . 1.05)))
-    (set-face-attribute (car face) nil :font "JetBrains Mono" :weight 'medium :height (cdr face)))
-#+end_src
-
 ** Org Indent
 Make sure org-indent face is available
 
