@@ -229,9 +229,9 @@ Silence compiler warnings as they can be pretty disruptive
 ** Fonts
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(set-face-attribute 'default nil :font "JetBrains Mono" :height 105)
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :height 105)
-(set-face-attribute 'variable-pitch nil :font "JetBrains Mono" :height 105)
+(set-face-attribute 'default nil :font "Source Code Pro" :height 100)
+(set-face-attribute 'fixed-pitch nil :font "Source Code Pro" :height 100)
+(set-face-attribute 'variable-pitch nil :font "Source Code Pro" :height 100)
 #+end_src
 
 ** Cursor
@@ -423,7 +423,7 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
     (which-key-show-major-mode)
     :diminish which-key-mode
     :config
-    (setq which-key-idle-delay 0.5)
+    (setq which-key-idle-delay 0.3)
     )
 #+end_src
 
@@ -431,123 +431,37 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package general
-    :init
-    (setq-default general-override-states '(insert
-                                            emacs
-                                            hybrid
-                                            normal
-                                            visual
-                                            motion
-                                            operator
-                                            replace))
-    :config
-    (general-define-key
-        :prefix "SPC"
-        :states '(normal visual motion)
-        :keymaps 'override
+  :init
+  (setq-default general-override-states '(insert
+                                          emacs
+                                          hybrid
+                                          normal
+                                          visual
+                                          motion
+                                          operator
+                                          replace))
+  :config
+  (general-evil-setup t))
+#+end_src
 
-        ","     '(persp-switch-to-buffer* :which-key "workspace beffer")
-        "."     '(consult-buffer :which-key "switch beffer")
-        ":"     '(execute-extended-command :which-key "M-x")
-        "s"     '(treemacs :which-key "treemacs")
-        "a"     '(toggle-transparency :which-key "transparency")
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+      ","     '(persp-switch-to-buffer* :which-key "workspace beffer")
+      "."     '(consult-buffer :which-key "switch beffer")
+      ":"     '(execute-extended-command :which-key "M-x")
+      ;;"s"     '(treemacs :which-key "treemacs")
 
-        "RET"   '(:ignore t :which-key "bookmark")
-        "RET j" '(consult-bookmark :which-key "bookmark jump")
-        "RET s" '(bookmark-set :which-key "bookmark set")
+      "c"     '(:ignore t :which-key "comments")
+      "c l"   '(comment-line :whick-key "comment or uncomment line")
+      "c r"   '(comment-or-uncomment-region :which-key "comment or uncomment region")
 
-        "TAB"   '(:ignore t :which-key "workspaces")
-        "TAB n" '(persp-next :which-key "next perspective")
-        "TAB p" '(persp-prev :which-key "prev perspective")
-        "TAB k" '(persp-kill :which-key "kill perspective")
-        "TAB b" '(persp-kill-buffer* :which-key "kill perspective buffer")
-        "TAB K" '(persp-kill-others :which-key "kill other perspectives")
-        "TAB l" '(persp-switch-last :which-key "switch last perspectives")
-        "TAB s" '(persp-switch :which-key "switch by name")
-        "TAB S" '(persp-state-save :which-key "save persp")
-        "TAB L" '(persp-state-load :which-key "load persp")
+      "e"     '(:ignore t :which-key "eval")
+      "e l"   '(eval-last-sexp :which-key "last sexp")
 
-        "b"     '(:ignore t :which-key "buffers")
-        "b k"   '(kill-buffer :which-key "kill buffer")
-        "b w"   '(kill-buffer-and-window :which-key "kill buffer and window")
-
-        "d"     '(:ignore t :whick-key "dired")
-        "d d"   '(dired :which-key "open dired")
-        "d j"   '(dired-jump :which-key "dired jump")
-        "d o"   '(dired-other-frame :which-key "dired other frame")
-
-        "c"     '(:ignore t :which-key "comments")
-        "c l"   '(comment-line :whick-key "comment or uncomment line")
-        "c r"   '(comment-or-uncomment-region :which-key "comment or uncomment region")
-
-        "e"     '(:ignore t :which-key "eval")
-        "e l"   '(eval-last-sexp :which-key "last sexp")
-
-        "f"     '(:ignore t :which-key "files")
-        "f d"   '(delete-file :whick-key "delete file")
-        "f l"   '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :whick-key "reload emacs config")
-        "f s"   '(save-buffer :whick-key "save file")
-        "f f"   '(find-file :which-key "find file")
-
-        "g"     '(:ignore t :which-key "git")
-        "g l"   '(:ignore t :which-key "log")
-        "g l c" '(magit-log-current :which-key "log current")
-        "g l f" '(magit-log-buffer-file :which-key "log buffer file")
-        "g c"   '(magit-commit :which-key "commit")
-        "g s"   '(magit-status :which-key "status")
-        "g d"   '(magit-diff-unstaged :which-key "diff unstaged")
-        "g c"   '(magit-branch-or-checkout :which-key "branch or checkout")
-        "g b"   '(magit-branch :which-key "branch")
-        "g p"   '(magit-push-current :which-key "push current")
-        "g P"   '(magit-pull-branch :which-key "pull branch")
-        "g f"   '(magit-fetch :which-key "fetch")
-        "g F"   '(magit-fetch-all :which-key "fetch all")
-        "g r"   '(magit-rebase :which-key "rebase")
-
-        "o"     '(:ignore t :which-key "org")
-        "o b"   '(:ignore t :whick-key "babel")
-        "o b t" '(org-babel-tangle :whick-key "tangle")
-        "o t"   '(org-insert-structure-template :whick-key "template")
-        "o r"   '(:ignore t :which-key "org-roam")
-        "o r t" '(org-roam-buffer-toggle :whick-key "toggle buffer")
-        "o r f" '(org-roam-node-find :which-key "node find")
-        "o r g" '(org-roam-graph :which-key "graph")
-        "o r i" '(org-roam-node-insert :which-key "node insert")
-        "o r c" '(org-roam-capture :which-key "capture")
-        "o r o" '(org-open-at-point :which-key "open at point")
-        "o r d" '(org-roam-dailies-capture-today :which-key "dailies capture today")
-        "o r w" '(org-capture-finalize :which-key "finalize")
-
-        "t"   '(:ignore t :which-key "term")
-        "t e" '(eshell :whick-key "eshell")
-        "t t" '(term :whick-key "term")
-        "t v" '(vterm :whick-key "vterm")
-        "t o" '(openwith-mode :whick-key "openwith-mode")
-
-        "p"     '(:ignore t :which-key "projectile")
-        "p f"   '(projectile-find-file :whick-key "find file")
-        "p p"   '(projectile-switch-project :whick-key "switch project")
-        "p k"   '(projectile-kill-buffers :whick-key "kill project buffers")
-
-        "q"     '(:ignore t :which-key "quit")
-        "q q"   '(save-buffers-kill-terminal :which-key "exit emacs")
-        "q k"   '(kill-emacs :which-key "kill emacs")
-
-        "w"     '(:ignore t :which-key "windows")
-        "w b"   '(evil-window-bottom-right :which-key "window bottom right")
-        "w d"   '(evil-window-delete :which-key "delete window")
-        "w s"   '(evil-window-split :which-key "split window")
-        "w v"   '(evil-window-vsplit :which-key "vsplit window")
-        "w h"   '(evil-window-left :which-key "left window")
-        "w l"   '(evil-window-right :which-key "right window")
-        "w j"   '(evil-window-down :which-key "down window")
-        "w k"   '(evil-window-up :which-key "up window")
-        "w ="   '(balance-windows :which-key "balance windows")
-        "w +"   '(evil-window-increase-height :which-key "increase window height")
-        "w -"   '(evil-window-decrease-height :which-key "decrease window height")
-        "w >"   '(evil-window-increase-width :which-key "increase window width")
-        "w <"   '(evil-window-decrease-width :which-key "decrease window widht")
-        "w t"   '(evil-window-top-left :which-key "window top left")))
+      "q"     '(:ignore t :which-key "quit")
+      "q q"   '(save-buffers-kill-terminal :which-key "exit emacs")
+      "q k"   '(kill-emacs :which-key "kill emacs")
+)
 #+end_src
 
 * Sudo Edit
@@ -618,6 +532,13 @@ Keep text selected after indentation
 #+end_src
    
 * Dired
+** Diredfl
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package diredfl
+  :hook (dired-mode . diredfl-mode))
+#+end_src
+
 ** Rainbow
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
@@ -649,17 +570,16 @@ Keep text selected after indentation
 ** Single
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package dired-single
-    :defer t)
+;;(use-package dired-single
+;;    :defer t)
 #+end_src
   
 ** Map
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (evil-collection-define-key 'normal 'dired-mode-map
-    "h" 'dired-single-up-directory
-    "H" 'dired-omit-mode
-    "l" 'dired-single-buffer)
+    "h" 'dired-up-directory
+    "l" 'dired-find-file)
 #+end_src
    
 ** Dired Icons
@@ -668,6 +588,17 @@ Keep text selected after indentation
 (use-package all-the-icons-dired
     :if (display-graphic-p)
     :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+       ;;"d"   '(:ignore t :whick-key "dired")
+       "d d" '(dired :which-key "open dired")
+       "d j" '(dired-jump :which-key "dired jump")
+       "d o" '(openwith-mode :whick-key "openwith-mode")
+)
 #+end_src
 
 * Files
@@ -697,6 +628,50 @@ Keep text selected after indentation
                 '(file)))))
 #+end_src
    
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+      "f"     '(:ignore t :which-key "files")
+      "f d"   '(delete-file :whick-key "delete file")
+      "f l"   '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :whick-key "reload emacs config")
+      "f s"   '(save-buffer :whick-key "save file")
+      "f f"   '(find-file :which-key "find file")
+      "f o"   '(openwith-mode :whick-key "openwith-mode")
+)
+#+end_src
+
+* Buffers and Bookmarks
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+      "RET"   '(:ignore t :which-key "bookmark")
+      "RET j" '(consult-bookmark :which-key "bookmark jump")
+      "RET s" '(bookmark-set :which-key "bookmark set")
+
+      "b"     '(:ignore t :which-key "buffers")
+      "b k"   '(kill-buffer :which-key "kill buffer")
+      "b w"   '(kill-buffer-and-window :which-key "kill buffer and window")
+
+      "w"     '(:ignore t :which-key "windows")
+      "w b"   '(evil-window-bottom-right :which-key "window bottom right")
+      "w d"   '(evil-window-delete :which-key "delete window")
+      "w s"   '(evil-window-split :which-key "split window")
+      "w v"   '(evil-window-vsplit :which-key "vsplit window")
+      "w h"   '(evil-window-left :which-key "left window")
+      "w l"   '(evil-window-right :which-key "right window")
+      "w j"   '(evil-window-down :which-key "down window")
+      "w k"   '(evil-window-up :which-key "up window")
+      "w ="   '(balance-windows :which-key "balance windows")
+      "w +"   '(evil-window-increase-height :which-key "increase window height")
+      "w -"   '(evil-window-decrease-height :which-key "decrease window height")
+      "w >"   '(evil-window-increase-width :which-key "increase window width")
+      "w <"   '(evil-window-decrease-width :which-key "decrease window widht")
+      "w t"   '(evil-window-top-left :which-key "window top left")
+)
+#+end_src
+
 * Workspaces
 ** persp-mode
 + 'persp-modestring-short' - only displays the current perspective
@@ -713,6 +688,23 @@ Keep text selected after indentation
     (persp-mode)))
 #+end_src
   
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+       "TAB"   '(:ignore t :which-key "workspaces")
+       "TAB n" '(persp-next :which-key "next perspective")
+       "TAB p" '(persp-prev :which-key "prev perspective")
+       "TAB k" '(persp-kill :which-key "kill perspective")
+       "TAB b" '(persp-kill-buffer* :which-key "kill perspective buffer")
+       "TAB K" '(persp-kill-others :which-key "kill other perspectives")
+       "TAB l" '(persp-switch-last :which-key "switch last perspectives")
+       "TAB s" '(persp-switch :which-key "switch by name")
+       "TAB S" '(persp-state-save :which-key "save persp")
+       "TAB L" '(persp-state-load :which-key "load persp")
+)
+#+end_src
+
 * Org
 ** Org-mode
 
@@ -724,7 +716,8 @@ Keep text selected after indentation
                         (auto-fill-mode 0)
                         (visual-line-mode 1)
                         (setq evil-auto-indent nil)
-                        (diminish org-indent-mode)))
+                        (diminish org-indent-mode)
+            ))
     :config
     (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t))
@@ -828,6 +821,26 @@ Get rid of the background on column views
       (shell . t)))
 #+end_src
 
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'org-mode-map :prefix "SPC"
+  "o"     '(:ignore t :which-key "org")
+  "o t"   '(org-insert-structure-template :whick-key "template")
+  "o b"   '(:ignore t :whick-key "babel")
+  "o b t" '(org-babel-tangle :whick-key "tangle")
+  "o r"   '(:ignore t :which-key "roam")
+  "o r t" '(org-roam-buffer-toggle :whick-key "toggle buffer")
+  "o r f" '(org-roam-node-find :which-key "node find")
+  "o r g" '(org-roam-graph :which-key "graph")
+  "o r i" '(org-roam-node-insert :which-key "node insert")
+  "o r c" '(org-roam-capture :which-key "capture")
+  "o r o" '(org-open-at-point :which-key "open at point")
+  "o r d" '(org-roam-dailies-capture-today :which-key "dailies capture today")
+  "o r w" '(org-capture-finalize :which-key "finalize")
+)
+#+end_src
+
 * Vertico
 ** Vertico
 + 'vertico-resize' - Grow and shrink the Vertico minibuffer.
@@ -912,6 +925,16 @@ A few more useful configurations.
 (use-package vterm)
 #+end_src
 
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+      "t"   '(:ignore t :which-key "term")
+      "t e" '(eshell :whick-key "eshell")
+      "t v" '(vterm :whick-key "vterm")
+)
+#+end_src
+
 * Git
 ** Magit
 
@@ -928,6 +951,27 @@ A few more useful configurations.
     (diff-hl-flydiff-mode)
     :hook ((magit-pre-refresh-hook . diff-hl-magit-pre-refresh)
             (magit-post-refresh-hook . diff-hl-magit-post-refresh)))
+#+end_src
+
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+       "g"     '(:ignore t :which-key "git")
+       "g l"   '(:ignore t :which-key "log")
+       "g l c" '(magit-log-current :which-key "log current")
+       "g l f" '(magit-log-buffer-file :which-key "log buffer file")
+       "g c"   '(magit-commit :which-key "commit")
+       "g s"   '(magit-status :which-key "status")
+       "g d"   '(magit-diff-unstaged :which-key "diff unstaged")
+       "g c"   '(magit-branch-or-checkout :which-key "branch or checkout")
+       "g b"   '(magit-branch :which-key "branch")
+       "g p"   '(magit-push-current :which-key "push current")
+       "g P"   '(magit-pull-branch :which-key "pull branch")
+       "g f"   '(magit-fetch :which-key "fetch")
+       "g F"   '(magit-fetch-all :which-key "fetch all")
+       "g r"   '(magit-rebase :which-key "rebase")
+)
 #+end_src
 
 * Company
@@ -971,7 +1015,18 @@ A few more useful configurations.
     ;; 	(setq projectile-project-search-path '("~/Dev")))
     (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
-  
+
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'override :prefix "SPC"
+      "p"     '(:ignore t :which-key "projectile")
+      "p f"   '(projectile-find-file :whick-key "find file")
+      "p p"   '(projectile-switch-project :whick-key "switch project")
+      "p k"   '(projectile-kill-buffers :whick-key "kill project buffers")
+)
+#+end_src
+
 * Yasnippet
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
