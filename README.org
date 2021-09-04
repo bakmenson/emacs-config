@@ -680,7 +680,7 @@ Keep text selected after indentation
 (use-package perspective
     :demand t
     :custom
-    (persp-initial-frame-name "emacs")
+    (persp-initial-frame-name "main")
     :config
     (setq-default persp-modestring-short t)
     ;; Running `persp-mode' multiple times resets the perspective list...
