@@ -915,6 +915,7 @@ A few more useful configurations.
       "t"   '(:ignore t :which-key "term")
       "t e" '(eshell :whick-key "eshell")
       "t v" '(vterm :whick-key "vterm")
+      "t t" '(term :whick-key "term")
 )
 #+end_src
 
