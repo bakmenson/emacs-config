@@ -721,6 +721,7 @@ Keep text selected after indentation
     :config
     (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t
+        org-src-preserve-indentation t
         org-startup-folded t))
 #+end_src
 
