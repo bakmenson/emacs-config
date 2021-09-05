@@ -720,7 +720,8 @@ Keep text selected after indentation
             ))
     :config
     (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t))
+        org-hide-emphasis-markers t
+        org-startup-folded t))
 #+end_src
 
 ** Superstar
