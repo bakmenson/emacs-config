@@ -3,16 +3,12 @@
 #+property: header-args :mkdirp yes
 #+property: header-args:emacs-lisp :tangle-mode (identity #o555)
 
-* Table of Contents
-:PROPERTIES:
-:TOC:      :include all :ignore this
-:END:
-:CONTENTS:
+* Table of Contents :TOC_1:
 - [[#early-init][Early Init]]
 - [[#garbage-collection][Garbage Collection]]
 - [[#native-compil][Native Compil]]
 - [[#functions][Functions]]
-- [[#package-management][Package Management ]]
+- [[#package-management][Package Management]]
 - [[#base-config][Base Config]]
 - [[#theme][Theme]]
 - [[#icons][Icons]]
@@ -24,6 +20,7 @@
 - [[#evil][Evil]]
 - [[#dired][Dired]]
 - [[#files][Files]]
+- [[#buffers-and-bookmarks][Buffers and Bookmarks]]
 - [[#workspaces][Workspaces]]
 - [[#org][Org]]
 - [[#vertico][Vertico]]
@@ -38,8 +35,6 @@
 - [[#rust][Rust]]
 - [[#java][Java]]
 - [[#flycheck][Flycheck]]
-:END:
-
 
 * Early Init
 ** Garbage collection at startup
