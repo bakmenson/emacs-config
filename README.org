@@ -166,7 +166,7 @@ Silence compiler warnings as they can be pretty disruptive
     (package-refresh-contents))
 #+end_src
 
-** Install use-packageo
+** Install use-package
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (unless (package-installed-p 'use-package)
