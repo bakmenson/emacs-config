@@ -806,6 +806,13 @@ Get rid of the background on column views
       (shell . t)))
 #+end_src
 
+** Toc-Org
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package toc-org
+  :hook ((org-mode . toc-org-mode)))
+#+end_src
+
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
