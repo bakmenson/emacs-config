@@ -685,7 +685,7 @@ Keep text selected after indentation
     (setq-default persp-modestring-short t)
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
-    (persp-mode)))
+            (persp-mode)))
 #+end_src
   
 ** Keybinds
