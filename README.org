@@ -210,6 +210,14 @@ Silence compiler warnings as they can be pretty disruptive
 (set-face-attribute 'fixed-pitch nil :font "Source Code Pro" :height 100)
 (set-face-attribute 'variable-pitch nil :font "Source Code Pro" :height 100)
 #+end_src
+** Encoding
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+#+end_src
 
 ** Cursor
 
