@@ -702,6 +702,18 @@ Keep text selected after indentation
         org-startup-folded t))
 #+end_src
 
+** Evil-Org
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package evil-org
+  :ensure t
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+#+end_src
+
 ** Superstar
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
