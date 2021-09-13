@@ -317,6 +317,17 @@ Configurations to smooth scrolling.
 (setq hscroll-margin 1)
 #+end_src
 
+** Visual Fill
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package visual-fill-column
+    :hook ((org-mode prog-mode) . (lambda ()
+                        (setq visual-fill-column-width 120
+                                visual-fill-column-center-text t)
+                        (visual-fill-column-mode 1)))
+)
+#+end_src
+
 * Theme
 ** Doom Theme
 + 'doom-themes-enable-bold' - if nil, bold is universally disabled
@@ -758,17 +769,6 @@ Get rid of the background on column views
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (set-face-attribute 'org-column nil :background nil)
 (set-face-attribute 'org-column-title nil :background nil)
-#+end_src
-
-** Visual Fill
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package visual-fill-column
-    :hook (org-mode . (lambda ()
-                        (setq visual-fill-column-width 120
-                                visual-fill-column-center-text t)
-                        (visual-fill-column-mode 1)))
-)
 #+end_src
 
 ** Roam
