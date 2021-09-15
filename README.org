@@ -1029,9 +1029,6 @@ A few more useful configurations.
     :init
     ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
     ;; (setq lsp-keymap-prefix "SPC")
-    (setq-default tab-width 4)
-    (setq-default c-basic-offset 4)
-    ;; (setq-default indent-tabs-mode nil)
     :config
     (lsp-modeline-code-actions-mode t)
     (setq-default lsp-modeline-code-actions-segments '(count icon name))
