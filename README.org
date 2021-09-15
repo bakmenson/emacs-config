@@ -1037,7 +1037,7 @@ A few more useful configurations.
     (setq-default lsp-modeline-code-actions-segments '(count icon name))
     (setq-default +format-with-lsp t)
     :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-        ;; (java-mode . lsp)
+        (java-mode . lsp)
         ;; (python-mode . lsp)
         (rust-mode . lsp)
         (sh-mode . lsp)
@@ -1088,15 +1088,7 @@ A few more useful configurations.
 * Java
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package meghanada
-    :hook (java-mode . (lambda ()
-                        (meghanada-mode t)
-                        (setq indent-tabs-mode t
-                            tab-width 4
-                            evil-shift-width 4)
-                        ;;(add-hook 'before-save-hook 'meghanada-code-beautify-before-save)
-                        ))
-    )
+(use-package lsp-java)
 #+end_src
   
 * Flycheck
