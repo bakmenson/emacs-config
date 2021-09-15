@@ -490,9 +490,6 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
     (setq evil-undo-system 'undo-fu)
-    :hook ((evil-insert-state-exit . (lambda ()
-                                        (call-interactively #'save-buffer)))
-            )
     :config
     (evil-mode 1))
 #+end_src
