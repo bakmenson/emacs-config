@@ -675,6 +675,7 @@ Keep text selected after indentation
     :custom
     (persp-initial-frame-name "main")
     :config
+    (persp-turn-off-modestring)
     (setq-default persp-modestring-short t)
     ;; Running `persp-mode' multiple times resets the perspective list...
     (unless (equal persp-mode t)
