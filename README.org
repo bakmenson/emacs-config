@@ -796,6 +796,12 @@ Get rid of the background on column views
   :hook ((org-mode . toc-org-mode)))
 #+end_src
 
+** Vimrc
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package vimrc-mode)
+#+end_src
+
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
