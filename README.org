@@ -1103,7 +1103,28 @@ A few more useful configurations.
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package lsp-java)
 #+end_src
-  
+
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'java-mode-map :prefix "SPC"
+      "m"     '(:ignore t :which-key "local")
+      "m a"   '(lsp-execute-code-action :whick-key "code action")
+      "m d"   '(lsp-goto-type-definition :whick-key "goto definition")
+      "m i"   '(lsp-goto-implementation :whick-key "goto implementation")
+      "m r"   '(lsp-rename :whick-key "rename")
+
+      "m e"   '(:ignore t :which-key "extract")
+      "m e m"   '(lsp-java-extract-method :whick-key "extract method")
+
+      "m g"   '(:ignore t :which-key "generate")
+      "m g e" '(lsp-java-generate-equals-and-hash-code :whick-key "equals and hash code")
+      "m g g" '(lsp-java-generate-getters-and-setters :whick-key "getters and setters")
+      "m g o" '(lsp-java-generate-overrides :whick-key "overrides")
+      "m g t" '(lsp-java-generate-to-string :whick-key "toString")
+)
+#+end_src
+
 * Flycheck
 ** flycheck
 
