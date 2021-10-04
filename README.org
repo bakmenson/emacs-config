@@ -328,6 +328,12 @@ Configurations to smooth scrolling.
 )
 #+end_src
 
+** Let it snow in Emacs!
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package snow)
+#+end_src
+
 * Theme
 ** Doom Theme
 + 'doom-themes-enable-bold' - if nil, bold is universally disabled
