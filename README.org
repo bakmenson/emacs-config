@@ -1084,6 +1084,14 @@ A few more useful configurations.
     :hook (python-mode . poetry-tracking-mode))
 #+end_src
    
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'python-mode-map :prefix "SPC"
+      "m"     '(:ignore t :which-key "local")
+)
+#+end_src
+
 * Rust
 ** rust-mode
 
