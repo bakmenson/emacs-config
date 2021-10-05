@@ -1116,7 +1116,7 @@ A few more useful configurations.
       "m r"   '(lsp-rename :whick-key "rename")
 
       "m e"   '(:ignore t :which-key "extract")
-      "m e m"   '(lsp-java-extract-method :whick-key "extract method")
+      "m e m" '(lsp-java-extract-method :whick-key "extract method")
 
       "m g"   '(:ignore t :which-key "generate")
       "m g e" '(lsp-java-generate-equals-and-hash-code :whick-key "equals and hash code")
