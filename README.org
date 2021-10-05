@@ -1059,7 +1059,7 @@ A few more useful configurations.
 #+end_src
   
 * Python
-** python-mode
+** Python Mode
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package python-mode
@@ -1067,7 +1067,7 @@ A few more useful configurations.
     (python-shell-interpreter "ipython"))
 #+end_src
 
-** lsp-pyright
+** Lsp-pyright
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package lsp-pyright
@@ -1077,7 +1077,7 @@ A few more useful configurations.
                             (lsp))))
 #+end_src
 
-** poetry
+** Poetry
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package poetry
