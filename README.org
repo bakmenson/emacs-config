@@ -1106,6 +1106,14 @@ A few more useful configurations.
     :hook ((rust-mode . cargo-minor-mode)))
 #+end_src
 
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'rust-mode-map :prefix "SPC"
+      "m"     '(:ignore t :which-key "local")
+)
+#+end_src
+
 * Java
 ** Lsp Java
 
