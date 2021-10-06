@@ -1058,6 +1058,18 @@ A few more useful configurations.
     :commands lsp)
 #+end_src
   
+** Keybinds
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(nvmap :keymaps 'lsp-mode-map :prefix "SPC"
+      "l"     '(:ignore t :which-key "lsp")
+      "l a"   '(lsp-execute-code-action :whick-key "code action")
+      "l d"   '(lsp-goto-type-definition :whick-key "goto definition")
+      "l i"   '(lsp-goto-implementation :whick-key "goto implementation")
+      "l r"   '(lsp-rename :whick-key "rename")
+)
+#+end_src
+
 * Python
 ** Python Mode
 
@@ -1089,6 +1101,8 @@ A few more useful configurations.
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'python-mode-map :prefix "SPC"
       "m"     '(:ignore t :which-key "local")
+      "m e"   '(:ignore t :which-key "execute")
+      ;; "m e f" '(py-execute-file-python :whick-key "file")
 )
 #+end_src
 
