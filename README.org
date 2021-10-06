@@ -1089,13 +1089,6 @@ A few more useful configurations.
                             (lsp))))
 #+end_src
 
-** Poetry
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package poetry
-    :hook (python-mode . poetry-tracking-mode))
-#+end_src
-   
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
