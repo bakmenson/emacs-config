@@ -1,21 +1,20 @@
 #+title: Emacs Config
 
 #+property: header-args :mkdirp yes
-#+property: header-args:emacs-lisp :tangle-mode (identity #o555)
+#+property: header-args:emacs-lisp :tangle-mode
 
 * Table of Contents :TOC_1:
 - [[#early-init][Early Init]]
 - [[#garbage-collection][Garbage Collection]]
-- [[#native-compil][Native Compil]]
 - [[#package-management][Package Management]]
 - [[#base-config][Base Config]]
 - [[#theme][Theme]]
 - [[#icons][Icons]]
 - [[#dashboard][Dashboard]]
 - [[#modeline][Modeline]]
+- [[#sudo-edit][Sudo Edit]]
 - [[#which-key][Which-Key]]
 - [[#general-keybindings][General Keybindings]]
-- [[#sudo-edit][Sudo Edit]]
 - [[#evil][Evil]]
 - [[#dired][Dired]]
 - [[#files][Files]]
@@ -27,13 +26,9 @@
 - [[#git][Git]]
 - [[#company][Company]]
 - [[#projectile][Projectile]]
-- [[#yasnippet][Yasnippet]]
-- [[#dap][Dap]]
-- [[#lsp][LSP]]
+- [[#flycheck][Flycheck]]
 - [[#python][Python]]
 - [[#rust][Rust]]
-- [[#java][Java]]
-- [[#flycheck][Flycheck]]
 
 * Early Init
 ** Garbage collection at startup
@@ -97,7 +92,7 @@ and stuttering during long-term interactive use.
 (defvar better-gc-cons-threshold 134217728) ; 128mb
 
 (add-hook 'emacs-startup-hook
-            (lambda ()
+          (lambda ()
             (setq gc-cons-threshold better-gc-cons-threshold)
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
@@ -107,45 +102,24 @@ and stuttering during long-term interactive use.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (add-hook 'emacs-startup-hook
-            (lambda ()
+          (lambda ()
             (if (boundp 'after-focus-change-function)
                 (add-function :after after-focus-change-function
-                                (lambda ()
+                              (lambda ()
                                 (unless (frame-focus-state)
-                                    (garbage-collect))))
-                (add-hook 'after-focus-change-function 'garbage-collect))
+                                  (garbage-collect))))
+              (add-hook 'after-focus-change-function 'garbage-collect))
             (defun gc-minibuffer-setup-hook ()
-                (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
 
             (defun gc-minibuffer-exit-hook ()
-                (garbage-collect)
-                (setq gc-cons-threshold better-gc-cons-threshold))
+              (garbage-collect)
+              (setq gc-cons-threshold better-gc-cons-threshold))
 
             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 #+end_src
 
-* Native Compil
-** Silence compiler warnings
-
-Silence compiler warnings as they can be pretty disruptive
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(if (boundp 'comp-deferred-compilation)
-    (setq comp-deferred-compilation nil)
-    (setq native-comp-deferred-compilation nil))
-#+end_src
-
-** Noninteractive sessions
-
-  Prioritize non-byte-compiled source files to
-  prevent the use of stale byte-code. Otherwise, it saves us a little IO time
-  to skip the mtime checks on every *.elc file.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(setq load-prefer-newer noninteractive)
-#+end_src
-  
 * Package Management
 ** Setup package archives
 
@@ -153,8 +127,8 @@ Silence compiler warnings as they can be pretty disruptive
 (require 'package)
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                        ("org" . "https://orgmode.org/elpa/")
-                        ("elpa" . "https://elpa.gnu.org/packages/")))
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 #+end_src
 
 ** Configure Package Manager
@@ -163,37 +137,37 @@ Silence compiler warnings as they can be pretty disruptive
 (package-initialize)
 
 (unless package-archive-contents
-    (package-refresh-contents))
+  (package-refresh-contents))
 #+end_src
 
 ** Install use-package
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
+  (package-install 'use-package))
 
 (eval-and-compile
-    (setq use-package-always-ensure t)
-    (setq use-package-expand-minimally t)
-    (setq use-package-enable-imenu-support t))
+  (setq use-package-always-ensure t)
+  (setq use-package-expand-minimally t)
+  (setq use-package-enable-imenu-support t))
 
 (eval-when-compile
-    (require 'use-package)
-    (require 'bind-key))
+  (require 'use-package)
+  (require 'bind-key))
 #+end_src
 
 ** Auto Update
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package auto-package-update
-    :if (not (daemonp))
-    :custom
-    (auto-package-update-interval 7) ;; in days
-    (auto-package-update-prompt-before-update t)
-    (auto-package-update-delete-old-versions t)
-    (auto-package-update-hide-results t)
-    :config
-    (auto-package-update-maybe))
+  :if (not (daemonp))
+  :custom
+  (auto-package-update-interval 7) ;; in days
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-delete-old-versions t)
+  (auto-package-update-hide-results t)
+  :config
+  (auto-package-update-maybe))
 #+end_src
 
 ** Diminish
@@ -210,6 +184,7 @@ Silence compiler warnings as they can be pretty disruptive
 (set-face-attribute 'fixed-pitch nil :font "Source Code Pro" :height 100)
 (set-face-attribute 'variable-pitch nil :font "Source Code Pro" :height 100)
 #+end_src
+
 ** Encoding
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
@@ -235,15 +210,14 @@ Silence compiler warnings as they can be pretty disruptive
 
 ;; Enable line numbers for some modes
 (dolist (mode '(text-mode-hook
-                                prog-mode-hook
-                                conf-mode-hook))
-    (add-hook mode (lambda ()
-                    (display-line-numbers-mode 1)
-                    (setq-default display-line-numbers-type 'relative)
-                    )))
+                prog-mode-hook
+                conf-mode-hook))
+  (add-hook mode (lambda ()
+                   (display-line-numbers-mode 1)
+                   (setq-default display-line-numbers-type 'relative))))
 
 (dolist (mode '(org-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 ** Parentheses
@@ -255,11 +229,13 @@ Silence compiler warnings as they can be pretty disruptive
 
 ** Auto-revert
 *** Revert Dired and other buffers
+
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (setq global-auto-revert-non-file-buffers t)
 #+end_src
 
 *** Revert buffers when the underlying file has changed
+
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (global-auto-revert-mode 1)
 #+end_src
@@ -277,25 +253,7 @@ Silence compiler warnings as they can be pretty disruptive
 (setq use-dialog-box nil)
 #+end_src
 
-** Prettify Symbols
-Prettify symbols mode, a built-in mode for displaying sequences of characters as fancy characters or symbols.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(global-prettify-symbols-mode 1)
-(defun add-pretty-lambda ()
-    "Make some word or string show as pretty Unicode symbols.  See https://unicodelookup.com for more."
-    (setq prettify-symbols-alist
-                '(("lambda" . 955)
-                    ("->" . 8594)
-                    ("<=" . 8804)
-                    (">=" . 8805))))
-(add-hook 'prog-mode-hook 'add-pretty-lambda)
-(add-hook 'org-mode-hook 'add-pretty-lambda)
-#+end_src
-
 ** Smooth Scrolling
-Configurations to smooth scrolling.
-
 *** Vertical Scroll
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
@@ -317,15 +275,28 @@ Configurations to smooth scrolling.
 (setq hscroll-margin 1)
 #+end_src
 
+** Fullscreen
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(custom-set-variables
+ '(initial-frame-alist (quote ((fullscreen . maximized)))))
+#+end_src
+
 ** Visual Fill
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package visual-fill-column
-    :hook ((org-mode prog-mode) . (lambda ()
-                        (setq visual-fill-column-width 120
-                                visual-fill-column-center-text t)
-                        (visual-fill-column-mode 1)))
-)
+  :hook ((org-mode prog-mode) . (lambda ()
+				  (setq visual-fill-column-width 120
+					visual-fill-column-center-text t)
+				  (visual-fill-column-mode 1))))
+#+end_src
+
+** Transparecy
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
+(add-to-list 'default-frame-alist '(alpha . (95 . 95)))
 #+end_src
 
 ** Let it snow in Emacs!
@@ -344,23 +315,14 @@ Configurations to smooth scrolling.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package doom-themes
-    :config
-    (setq doom-themes-enable-bold t
+  :config
+  (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-    (load-theme 'doom-one t)
-
-    (doom-themes-visual-bell-config)
-    (setq-default doom-themes-treemacs-theme "doom-atom")
-    (doom-themes-treemacs-config)
-    (doom-themes-org-config))
-#+end_src
-
-** JetBrains Darcula
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-;;(use-package jetbrains-darcula-theme
-;;	:config
-;;	(load-theme 'jetbrains-darcula t))
+  (load-theme 'doom-one t)
+  (doom-themes-visual-bell-config)
+  (setq-default doom-themes-treemacs-theme "doom-atom")
+  (doom-themes-treemacs-config)
+  (doom-themes-org-config))
 #+end_src
 
 * Icons
@@ -381,19 +343,19 @@ An extensible emacs startup screen showing you what’s most important.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package dashboard
-    :init
-    (setq dashboard-banner-logo-title "Welcome to Emacs!")
-    (setq dashboard-startup-banner 'logo)
-    (setq dashboard-center-content t)
-    (setq dashboard-items '((recents  . 10)
-                        (bookmarks . 10)
-                        (projects . 5)))
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-set-navigator t)
-    ;; (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
-    :config
-    (dashboard-setup-startup-hook))
+  :init
+  (setq dashboard-banner-logo-title "Welcome to Emacs!")
+  (setq dashboard-startup-banner 'logo)
+  (setq dashboard-center-content t)
+  (setq dashboard-items '((recents  . 10)
+                          (bookmarks . 10)
+                          (projects . 5)))
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-navigator t)
+  ;; (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+  :config
+  (dashboard-setup-startup-hook))
 #+end_src
 
 ** Dashboard in Emacsclient
@@ -408,25 +370,30 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package doom-modeline
-    :init (doom-modeline-mode 1)
-    :custom
-    (doom-modeline-height 25)
-    (doom-modeline-persp-name nil)
-    )
+  :init (doom-modeline-mode 1)
+  :custom
+  (doom-modeline-height 25)
+  (doom-modeline-persp-name nil))
+#+end_src
+
+* Sudo Edit
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package sudo-edit
+  :commands (sudo-edit))
 #+end_src
 
 * Which-Key
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package which-key
-    :init
-    (which-key-mode)
-    (which-key-setup-minibuffer)
-    (which-key-show-major-mode)
-    :diminish which-key-mode
-    :config
-    (setq which-key-idle-delay 0.3)
-    )
+  :init
+  (which-key-mode)
+  (which-key-setup-minibuffer)
+  (which-key-show-major-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
 #+end_src
 
 * General Keybindings
@@ -448,29 +415,22 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-      ","     '(persp-switch-to-buffer* :which-key "workspace beffer")
-      "."     '(consult-buffer :which-key "switch beffer")
-      ":"     '(execute-extended-command :which-key "M-x")
-      ;;"s"     '(treemacs :which-key "treemacs")
+  ","     '(persp-switch-to-buffer* :which-key "workspace beffer")
+  "."     '(consult-buffer :which-key "switch beffer")
+  ":"     '(execute-extended-command :which-key "M-x")
+  ;;"s"     '(treemacs :which-key "treemacs")
 
-      "c"     '(:ignore t :which-key "comments")
-      "c l"   '(comment-line :whick-key "comment or uncomment line")
-      "c r"   '(comment-or-uncomment-region :which-key "comment or uncomment region")
+  "c"     '(:ignore t :which-key "comments")
+  "c l"   '(comment-line :whick-key "comment or uncomment line")
+  "c r"   '(comment-or-uncomment-region :which-key "comment or uncomment region")
 
-      "e"     '(:ignore t :which-key "eval")
-      "e l"   '(eval-last-sexp :which-key "last sexp")
+  "e"     '(:ignore t :which-key "eval")
+  "e l"   '(eval-last-sexp :which-key "last sexp")
 
-      "q"     '(:ignore t :which-key "quit")
-      "q q"   '(save-buffers-kill-terminal :which-key "exit emacs")
-      "q k"   '(kill-emacs :which-key "kill emacs")
-)
-#+end_src
-
-* Sudo Edit
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package sudo-edit
-    :commands (sudo-edit))
+  "q"     '(:ignore t :which-key "quit")
+  "q q"   '(save-buffers-kill-terminal :which-key "exit emacs")
+  "q k"   '(kill-emacs :which-key "kill emacs")
+  )
 #+end_src
 
 * Evil
@@ -478,8 +438,8 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package undo-tree
-    :config
-    (global-undo-tree-mode))
+  :config
+  (global-undo-tree-mode))
 #+end_src
 
 ** undo-fu
@@ -492,21 +452,21 @@ This setting ensures that emacsclient always opens on dashboard rather than scra
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package evil
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-undo-system 'undo-fu)
-    :config
-    (evil-mode 1))
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-undo-system 'undo-fu)
+  :config
+  (evil-mode 1))
 #+end_src
 
 ** evil-collection
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
+  :after evil
+  :config
+  (evil-collection-init))
 #+end_src
 
 ** evil shift
@@ -515,21 +475,21 @@ Keep text selected after indentation
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (defun my/evil-shift-right ()
-    (interactive)
-    (evil-shift-right evil-visual-beginning evil-visual-end)
-    (evil-normal-state)
-    (evil-visual-restore))
+  (interactive)
+  (evil-shift-right evil-visual-beginning evil-visual-end)
+  (evil-normal-state)
+  (evil-visual-restore))
 
 (defun my/evil-shift-left ()
-    (interactive)
-    (evil-shift-left evil-visual-beginning evil-visual-end)
-    (evil-normal-state)
-    (evil-visual-restore))
+  (interactive)
+  (evil-shift-left evil-visual-beginning evil-visual-end)
+  (evil-normal-state)
+  (evil-visual-restore))
 
 (evil-define-key 'visual global-map (kbd ">") 'my/evil-shift-right)
 (evil-define-key 'visual global-map (kbd "<") 'my/evil-shift-left)
 #+end_src
-   
+
 * Dired
 ** Diredfl
 
@@ -542,102 +502,68 @@ Keep text selected after indentation
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package dired-rainbow
-    :defer 2
-    :config
-    (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
-    (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
-    (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
-    (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
-    (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
-    (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
-    (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
-    (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
-    (dired-rainbow-define log "#c17d11" ("log"))
-    (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
-    (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
-    (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
-    (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
-    (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
-    (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
-    (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
-    (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
-    (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
-    (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
+  :defer 2
+  :config
+  (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+  (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+  (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+  (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+  (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+  (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+  (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+  (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+  (dired-rainbow-define log "#c17d11" ("log"))
+  (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+  (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+  (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+  (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+  (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+  (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+  (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+  (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+  (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+  (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+  (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
 #+end_src
-   
-** Single
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-;;(use-package dired-single
-;;    :defer t)
-#+end_src
-  
 ** Map
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (evil-collection-define-key 'normal 'dired-mode-map
-    "h" 'dired-up-directory
-    "l" 'dired-find-file)
+  "h" 'dired-up-directory
+  "l" 'dired-find-file)
 #+end_src
-   
+
 ** Dired Icons
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package all-the-icons-dired
-    :if (display-graphic-p)
-    :hook (dired-mode . all-the-icons-dired-mode))
+  :if (display-graphic-p)
+  :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-       ;;"d"   '(:ignore t :whick-key "dired")
-       "d d" '(dired :which-key "open dired")
-       "d j" '(dired-jump :which-key "dired jump")
-       "d o" '(openwith-mode :whick-key "openwith-mode")
-)
+  ;;"d"   '(:ignore t :whick-key "dired")
+  "d d" '(dired :which-key "open dired")
+  "d j" '(dired-jump :which-key "dired jump")
+  "d o" '(openwith-mode :whick-key "openwith-mode")
+  )
 #+end_src
 
 * Files
-** Opening Files Externally
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package openwith
-    :config
-    (setq large-file-warning-threshold nil)
-    (setq openwith-associations
-        (list
-            (list (openwith-make-extension-regexp
-                '("mpg" "mpeg" "mp3" "mp4"
-                    "avi" "wmv" "wav" "mov" "flv"
-                    "ogm" "ogg" "mkv"))
-                "mpv"
-                '(file))
-            (list (openwith-make-extension-regexp
-                '("xbm" "pbm" "pgm" "ppm" "pnm"
-                    "png" "gif" "bmp" "tif" "jpeg"
-                    "jpg"))
-                    "feh"
-                    '(file))
-            (list (openwith-make-extension-regexp
-                '("pdf"))
-                "evince"
-                '(file)))))
-#+end_src
-   
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-      "f"     '(:ignore t :which-key "files")
-      "f d"   '(delete-file :whick-key "delete file")
-      "f l"   '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :whick-key "reload emacs config")
-      "f s"   '(save-buffer :whick-key "save file")
-      "f f"   '(find-file :which-key "find file")
-      "f o"   '(openwith-mode :whick-key "openwith-mode")
-)
+  "f"     '(:ignore t :which-key "files")
+  "f d"   '(delete-file :whick-key "delete file")
+  "f l"   '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :whick-key "reload emacs config")
+  "f s"   '(save-buffer :whick-key "save file")
+  "f f"   '(find-file :which-key "find file")
+  )
 #+end_src
 
 * Buffers and Bookmarks
@@ -645,30 +571,30 @@ Keep text selected after indentation
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-      "RET"   '(:ignore t :which-key "bookmark")
-      "RET j" '(consult-bookmark :which-key "bookmark jump")
-      "RET s" '(bookmark-set :which-key "bookmark set")
+  "RET"   '(:ignore t :which-key "bookmark")
+  "RET j" '(consult-bookmark :which-key "bookmark jump")
+  "RET s" '(bookmark-set :which-key "bookmark set")
 
-      "b"     '(:ignore t :which-key "buffers")
-      "b k"   '(kill-buffer :which-key "kill buffer")
-      "b w"   '(kill-buffer-and-window :which-key "kill buffer and window")
+  "b"     '(:ignore t :which-key "buffers")
+  "b k"   '(kill-buffer :which-key "kill buffer")
+  "b w"   '(kill-buffer-and-window :which-key "kill buffer and window")
 
-      "w"     '(:ignore t :which-key "windows")
-      "w b"   '(evil-window-bottom-right :which-key "window bottom right")
-      "w d"   '(evil-window-delete :which-key "delete window")
-      "w s"   '(evil-window-split :which-key "split window")
-      "w v"   '(evil-window-vsplit :which-key "vsplit window")
-      "w h"   '(evil-window-left :which-key "left window")
-      "w l"   '(evil-window-right :which-key "right window")
-      "w j"   '(evil-window-down :which-key "down window")
-      "w k"   '(evil-window-up :which-key "up window")
-      "w ="   '(balance-windows :which-key "balance windows")
-      "w +"   '(evil-window-increase-height :which-key "increase window height")
-      "w -"   '(evil-window-decrease-height :which-key "decrease window height")
-      "w >"   '(evil-window-increase-width :which-key "increase window width")
-      "w <"   '(evil-window-decrease-width :which-key "decrease window widht")
-      "w t"   '(evil-window-top-left :which-key "window top left")
-)
+  "w"     '(:ignore t :which-key "windows")
+  "w b"   '(evil-window-bottom-right :which-key "window bottom right")
+  "w d"   '(evil-window-delete :which-key "delete window")
+  "w s"   '(evil-window-split :which-key "split window")
+  "w v"   '(evil-window-vsplit :which-key "vsplit window")
+  "w h"   '(evil-window-left :which-key "left window")
+  "w l"   '(evil-window-right :which-key "right window")
+  "w j"   '(evil-window-down :which-key "down window")
+  "w k"   '(evil-window-up :which-key "up window")
+  "w ="   '(balance-windows :which-key "balance windows")
+  "w +"   '(evil-window-increase-height :which-key "increase window height")
+  "w -"   '(evil-window-decrease-height :which-key "decrease window height")
+  "w >"   '(evil-window-increase-width :which-key "increase window width")
+  "w <"   '(evil-window-decrease-width :which-key "decrease window widht")
+  "w t"   '(evil-window-top-left :which-key "window top left")
+  )
 #+end_src
 
 * Workspaces
@@ -677,32 +603,33 @@ Keep text selected after indentation
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package perspective
-    :demand t
-    :custom
-    (persp-initial-frame-name "main")
-    :config
-    (persp-turn-off-modestring)
-    (setq-default persp-modestring-short t)
-    ;; Running `persp-mode' multiple times resets the perspective list...
-    (unless (equal persp-mode t)
-            (persp-mode)))
+  :demand t
+  :custom
+  (persp-initial-frame-name "main")
+  :config
+  ;;(persp-turn-off-modestring)
+  (setq-default persp-modestring-short t
+		persp-state-default-file "~/persp")
+  ;; Running `persp-mode' multiple times resets the perspective list...
+  (unless (equal persp-mode t)
+    (persp-mode)))
 #+end_src
-  
+
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-       "TAB"   '(:ignore t :which-key "workspaces")
-       "TAB n" '(persp-next :which-key "next perspective")
-       "TAB p" '(persp-prev :which-key "prev perspective")
-       "TAB k" '(persp-kill :which-key "kill perspective")
-       "TAB b" '(persp-kill-buffer* :which-key "kill perspective buffer")
-       "TAB K" '(persp-kill-others :which-key "kill other perspectives")
-       "TAB l" '(persp-switch-last :which-key "switch last perspectives")
-       "TAB s" '(persp-switch :which-key "switch by name")
-       "TAB S" '(persp-state-save :which-key "save persp")
-       "TAB L" '(persp-state-load :which-key "load persp")
-)
+  "TAB"   '(:ignore t :which-key "workspaces")
+  "TAB n" '(persp-next :which-key "next perspective")
+  "TAB p" '(persp-prev :which-key "prev perspective")
+  "TAB k" '(persp-kill :which-key "kill perspective")
+  "TAB b" '(persp-kill-buffer* :which-key "kill perspective buffer")
+  "TAB K" '(persp-kill-others :which-key "kill other perspectives")
+  "TAB l" '(persp-switch-last :which-key "switch last perspectives")
+  "TAB ." '(persp-switch :which-key "switch by name")
+  "TAB s" '(persp-state-save :which-key "save persp")
+  "TAB L" '(persp-state-load :which-key "load persp")
+  )
 #+end_src
 
 * Org
@@ -710,16 +637,15 @@ Keep text selected after indentation
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package org
-    :hook (org-mode . (lambda ()
-                        (org-indent-mode)
-                        (variable-pitch-mode 1)
-                        (auto-fill-mode 0)
-                        (visual-line-mode 1)
-                        (setq evil-auto-indent nil)
-                        (diminish org-indent-mode)
-            ))
-    :config
-    (setq org-ellipsis " ▾"
+  :hook (org-mode . (lambda ()
+                      (org-indent-mode)
+                      (variable-pitch-mode 1)
+                      (auto-fill-mode 0)
+                      (visual-line-mode 1)
+                      (setq evil-auto-indent nil)
+                      (diminish org-indent-mode)))
+  :config
+  (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t
         org-src-preserve-indentation t
         org-startup-folded t))
@@ -729,12 +655,11 @@ Keep text selected after indentation
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package org-superstar
-    :after org
-    :hook (org-mode . org-superstar-mode)
-    :custom
-    (org-superstar-remove-leading-stars t)
-    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●"))
-)
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :custom
+  (org-superstar-remove-leading-stars t)
+  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
 #+end_src
 
 ** Org Indent
@@ -767,15 +692,15 @@ Get rid of the background on column views
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package org-roam
-    :ensure t
-    :init
-    (setq org-roam-v2-ack t)
-    :custom
-    (org-roam-directory (file-truename "~/org/roam_notes/"))
-    (org-roam-compilation-everywhere t)
-    :bind (("C-c n i" . org-roam-node-insert))
-    :config
-    (org-roam-db-autosync-mode))
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory (file-truename "~/roam/"))
+  (org-roam-compilation-everywhere t)
+  :bind (("C-c n i" . org-roam-node-insert))
+  :config
+  (org-roam-db-autosync-mode))
 #+end_src
 
 ** Babel
@@ -789,10 +714,10 @@ Get rid of the background on column views
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (org-babel-do-load-languages
-    'org-babel-load-languages
-    '((emacs-lisp . t)
-      (python . t)
-      (shell . t)))
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (shell . t)))
 #+end_src
 
 ** Toc-Org
@@ -806,7 +731,7 @@ Get rid of the background on column views
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package vimrc-mode
-    :after org)
+  :after org)
 #+end_src
 
 ** Keybinds
@@ -826,7 +751,7 @@ Get rid of the background on column views
   "o r o" '(org-open-at-point :which-key "open at point")
   "o r d" '(org-roam-dailies-capture-today :which-key "dailies capture today")
   "o r w" '(org-capture-finalize :which-key "finalize")
-)
+  )
 #+end_src
 
 * Vertico
@@ -836,11 +761,10 @@ Get rid of the background on column views
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package vertico
-    :init
-    (vertico-mode)
-    (setq vertico-resize t)
-    (setq vertico-cycle t)
-    )
+  :init
+  (vertico-mode)
+  (setq vertico-resize t)
+  (setq vertico-cycle t))
 #+end_src
 
 ** Consult
@@ -858,8 +782,8 @@ with `find-file' if you enter a wildcard. You may also give the
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package orderless
-    :init
-    (setq completion-styles '(orderless)
+  :init
+  (setq completion-styles '(orderless)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
@@ -869,8 +793,8 @@ Persist history over Emacs restarts. Vertico sorts by history position.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package savehist
-    :init
-    (savehist-mode))
+  :init
+  (savehist-mode))
 #+end_src
 
 ** Emacs
@@ -880,14 +804,14 @@ A few more useful configurations.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package emacs
-    :init
-    (defun crm-indicator (args)
+  :init
+  (defun crm-indicator (args)
     (cons (concat "[CRM] " (car args)) (cdr args)))
     (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
     ;; Do not allow the cursor in the minibuffer prompt
     (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
+          '(read-only t cursor-intangible t face minibuffer-prompt))
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
     ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
@@ -902,8 +826,8 @@ A few more useful configurations.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package marginalia
-    :init
-    (marginalia-mode))
+  :init
+  (marginalia-mode))
 #+end_src
 
 * Terminal
@@ -917,11 +841,11 @@ A few more useful configurations.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-      "t"   '(:ignore t :which-key "term")
-      "t e" '(eshell :whick-key "eshell")
-      "t v" '(vterm :whick-key "vterm")
-      "t t" '(term :whick-key "term")
-)
+  "t"   '(:ignore t :which-key "term")
+  "t e" '(eshell :whick-key "eshell")
+  "t v" '(vterm :whick-key "vterm")
+  "t t" '(term :whick-key "term")
+  )
 #+end_src
 
 * Git
@@ -935,32 +859,32 @@ A few more useful configurations.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package diff-hl
-    :init
-    (global-diff-hl-mode)
-    (diff-hl-flydiff-mode)
-    :hook ((magit-pre-refresh-hook . diff-hl-magit-pre-refresh)
-            (magit-post-refresh-hook . diff-hl-magit-post-refresh)))
+  :init
+  (global-diff-hl-mode)
+  (diff-hl-flydiff-mode)
+  :hook ((magit-pre-refresh-hook . diff-hl-magit-pre-refresh)
+         (magit-post-refresh-hook . diff-hl-magit-post-refresh)))
 #+end_src
 
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-       "g"     '(:ignore t :which-key "git")
-       "g l"   '(:ignore t :which-key "log")
-       "g l c" '(magit-log-current :which-key "log current")
-       "g l f" '(magit-log-buffer-file :which-key "log buffer file")
-       "g c"   '(magit-commit :which-key "commit")
-       "g s"   '(magit-status :which-key "status")
-       "g d"   '(magit-diff-unstaged :which-key "diff unstaged")
-       "g c"   '(magit-branch-or-checkout :which-key "branch or checkout")
-       "g b"   '(magit-branch :which-key "branch")
-       "g p"   '(magit-push-current :which-key "push current")
-       "g P"   '(magit-pull-branch :which-key "pull branch")
-       "g f"   '(magit-fetch :which-key "fetch")
-       "g F"   '(magit-fetch-all :which-key "fetch all")
-       "g r"   '(magit-rebase :which-key "rebase")
-)
+  "g"     '(:ignore t :which-key "git")
+  "g l"   '(:ignore t :which-key "log")
+  "g l c" '(magit-log-current :which-key "log current")
+  "g l f" '(magit-log-buffer-file :which-key "log buffer file")
+  "g c"   '(magit-commit :which-key "commit")
+  "g s"   '(magit-status :which-key "status")
+  "g d"   '(magit-diff-unstaged :which-key "diff unstaged")
+  "g c"   '(magit-branch-or-checkout :which-key "branch or checkout")
+  "g b"   '(magit-branch :which-key "branch")
+  "g p"   '(magit-push-current :which-key "push current")
+  "g P"   '(magit-pull-branch :which-key "pull branch")
+  "g f"   '(magit-fetch :which-key "fetch")
+  "g F"   '(magit-fetch-all :which-key "fetch all")
+  "g r"   '(magit-rebase :which-key "rebase")
+  )
 #+end_src
 
 * Company
@@ -968,135 +892,64 @@ A few more useful configurations.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package company
-    :hook (after-init . global-company-mode)
-    :custom
-    (company-minimum-prefix-length 1)
-    (company-idle-delay 0.0)
-    )
+  :hook (after-init . global-company-mode)
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
 #+end_src
-   
+
 ** company-shell
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package company-shell
-    :after sh-script
-    :custom (add-to-list 'company-backends 'company-shell))
+  :after sh-script
+  :custom (add-to-list 'company-backends 'company-shell))
 #+end_src
-   
+
 ** company-box
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package company-box
-    :hook (company-mode . company-box-mode))
+  :hook (company-mode . company-box-mode))
 #+end_src
-   
+
 * Projectile
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package projectile
-    :diminish projectile-mode
-    :config (projectile-mode +1)
-    ;; :custom ((projectile-completion-system 'ivy))
-    :bind-keymap ("C-c p" . projectile-command-map)
-    :init
-    ;; (when (file-directory-p "~/Dev")
-    ;; 	(setq projectile-project-search-path '("~/Dev")))
-    (setq projectile-switch-project-action #'projectile-dired))
+  :diminish projectile-mode
+  :config (projectile-mode +1)
+  ;; :custom ((projectile-completion-system 'ivy))
+  :bind-keymap ("C-c p" . projectile-command-map)
+  :init
+  ;; (when (file-directory-p "~/Dev")
+  ;; 	(setq projectile-project-search-path '("~/Dev")))
+  (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
 
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (nvmap :keymaps 'override :prefix "SPC"
-      "p"     '(:ignore t :which-key "projectile")
-      "p f"   '(projectile-find-file :whick-key "find file")
-      "p p"   '(projectile-switch-project :whick-key "switch project")
-      "p k"   '(projectile-kill-buffers :whick-key "kill project buffers")
-)
+  "p"     '(:ignore t :which-key "projectile")
+  "p f"   '(projectile-find-file :whick-key "find file")
+  "p p"   '(projectile-switch-project :whick-key "switch project")
+  "p k"   '(projectile-kill-buffers :whick-key "kill project buffers")
+  )
 #+end_src
 
-* Yasnippet
+* Flycheck
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package yasnippet :config (yas-global-mode))
-#+end_src
-  
-* Dap
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package dap-mode
-    :diminish
-    :bind
-    (:map dap-mode-map
-        (("<f12>" . dap-debug)
-        ("<f8>" . dap-continue)
-        ("<f9>" . dap-next)
-        ("<M-f11>" . dap-step-in)
-        ("C-M-<f11>" . dap-step-out)
-        ("<f7>" . dap-breakpoint-toggle))))
-#+end_src
-  
-* LSP
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package lsp-mode
-    :init
-    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-    ;; (setq lsp-keymap-prefix "SPC")
-    (setq-default tab-width 4)
-    (setq-default c-basic-offset 4)
-    :config
-    (lsp-modeline-code-actions-mode t)
-    (setq-default lsp-modeline-code-actions-segments '(count icon name))
-    (setq-default +format-with-lsp t)
-    :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-        (java-mode . lsp)
-        ;; (python-mode . lsp)
-        (rust-mode . lsp)
-        (sh-mode . lsp)
-        (lsp-mode . lsp-enable-which-key-integration))
-    :commands lsp)
-#+end_src
-  
-** Keybinds
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'lsp-mode-map :prefix "SPC"
-      "l"     '(:ignore t :which-key "lsp")
-      "l a"   '(lsp-execute-code-action :whick-key "code action")
-      "l d"   '(lsp-goto-type-definition :whick-key "goto definition")
-      "l i"   '(lsp-goto-implementation :whick-key "goto implementation")
-      "l r"   '(lsp-rename :whick-key "rename")
-)
+(use-package flycheck
+  :config
+  (add-to-list 'flycheck-check-syntax-automatically 'idle-change))
 #+end_src
 
 * Python
-** Python Mode
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package python-mode
-    :custom
-    (python-shell-interpreter "ipython"))
-#+end_src
-
-** Lsp-pyright
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package lsp-pyright
-    :ensure t
-    :hook (python-mode . (lambda ()
-                            (require 'lsp-pyright)
-                            (lsp))))
-#+end_src
-
-** Keybinds
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'python-mode-map :prefix "SPC"
-      "m"     '(:ignore t :which-key "local")
-      "m e"   '(:ignore t :which-key "execute")
-      ;; "m e f" '(py-execute-file-python :whick-key "file")
-)
+(use-package python-mode)
 #+end_src
 
 * Rust
@@ -1110,59 +963,5 @@ A few more useful configurations.
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
 (use-package cargo
-    :hook ((rust-mode . cargo-minor-mode)))
-#+end_src
-
-** Keybinds
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'rust-mode-map :prefix "SPC"
-      "m"     '(:ignore t :which-key "local")
-)
-#+end_src
-
-* Java
-** Lsp Java
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package lsp-java)
-#+end_src
-
-** Keybinds
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'java-mode-map :prefix "SPC"
-      "m"     '(:ignore t :which-key "local")
-      "m a"   '(lsp-execute-code-action :whick-key "code action")
-      "m d"   '(lsp-goto-type-definition :whick-key "goto definition")
-      "m i"   '(lsp-goto-implementation :whick-key "goto implementation")
-      "m r"   '(lsp-rename :whick-key "rename")
-
-      "m e"   '(:ignore t :which-key "extract")
-      "m e m" '(lsp-java-extract-method :whick-key "extract method")
-
-      "m g"   '(:ignore t :which-key "generate")
-      "m g e" '(lsp-java-generate-equals-and-hash-code :whick-key "equals and hash code")
-      "m g g" '(lsp-java-generate-getters-and-setters :whick-key "getters and setters")
-      "m g o" '(lsp-java-generate-overrides :whick-key "overrides")
-      "m g t" '(lsp-java-generate-to-string :whick-key "toString")
-)
-#+end_src
-
-* Flycheck
-** flycheck
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package flycheck
-    :config
-    (add-to-list 'flycheck-check-syntax-automatically 'idle-change))
-#+end_src
-   
-** flycheck-rust
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package flycheck-rust
-    :after (rust-mode)
-    :hook ((flycheck-mode . flycheck-rust-setup))
-    )
+  :hook ((rust-mode . cargo-minor-mode)))
 #+end_src
