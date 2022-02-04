@@ -554,6 +554,15 @@ Keep text selected after indentation
 #+end_src
 
 * Files
+** pdf
+
+#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+(use-package pdf-tools
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-page))
+#+end_src
+
 ** Keybinds
 
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
