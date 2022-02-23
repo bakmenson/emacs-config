@@ -530,7 +530,7 @@ An extensible emacs startup screen showing you what’s most important.
           )))
 #+end_src
 
-** dired icons
+** dired-icons
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'all-the-icons-dired)
