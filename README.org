@@ -535,10 +535,6 @@ An extensible emacs startup screen showing you what’s most important.
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'all-the-icons-dired)
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-
-;;(use-package all-the-icons-dired
-;;  :if (display-graphic-p)
-;;  :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
 ** bookmarks
