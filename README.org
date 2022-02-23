@@ -3,678 +3,642 @@
 #+property: header-args :mkdirp yes
 #+property: header-args:emacs-lisp :tangle-mode
 
-* Table of Contents :TOC_1:
+* Table Of Content :toc_1:
 - [[#early-init][Early Init]]
-- [[#garbage-collection][Garbage Collection]]
 - [[#package-management][Package Management]]
 - [[#base-config][Base Config]]
-- [[#theme][Theme]]
-- [[#icons][Icons]]
-- [[#dashboard][Dashboard]]
-- [[#modeline][Modeline]]
-- [[#sudo-edit][Sudo Edit]]
-- [[#which-key][Which-Key]]
-- [[#general-keybindings][General Keybindings]]
 - [[#evil][Evil]]
-- [[#dired][Dired]]
-- [[#files][Files]]
-- [[#buffers-and-bookmarks][Buffers and Bookmarks]]
-- [[#workspaces][Workspaces]]
-- [[#org][Org]]
-- [[#vertico][Vertico]]
+- [[#ui][UI]]
+- [[#buffers][Buffers]]
+- [[#tab-bar][Tab Bar]]
 - [[#terminal][Terminal]]
-- [[#git][Git]]
+- [[#dired][Dired]]
+- [[#org][Org]]
+- [[#files][Files]]
+- [[#workspaces][Workspaces]]
+- [[#completion][Completion]]
+- [[#editing][Editing]]
 - [[#company][Company]]
-- [[#projectile][Projectile]]
-- [[#flycheck][Flycheck]]
-- [[#python][Python]]
-- [[#rust][Rust]]
+- [[#coding][Coding]]
+- [[#emacs][Emacs]]
 
 * Early Init
-** Garbage collection at startup
+** garbage collection at startup
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
-(setq gc-cons-threshold 100000000)
+- =Increase the GC threshold for faster startup=
+  =The default is 800 kilobytes.  Measured in bytes.=
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
 
-** Disable package-enable-at-startup
-Package initialize occurs automatically, before user-init-file is loaded, but after early-init-file. We handle package initialization, so we must prevent Emacs from doing it early!
+** native compilation settings
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(when (featurep 'native-compile)
+  ;; Silence compiler warnings as they can be pretty disruptive
+  (setq native-comp-async-report-warnings-errors nil)
+
+  ;; Make native compilation happens asynchronously
+  (setq native-comp-deferred-compilation t)
+
+  ;; Set the right directory to store the native compilation cache
+  (add-to-list 'native-comp-eln-load-path (expand-file-name "eln-cache/" user-emacs-directory)))
+#+end_src
+
+** disable package-enable-at-startup
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (setq package-enable-at-startup nil)
 #+end_src
 
-** Unset file-name-handler-alist
-Every file opened and loaded by Emacs will run through this list to check for a proper handler for the file, but during startup, it won’t need any of them.
+** remove some unneeded UI elements
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
-(defvar file-name-handler-alist-original file-name-handler-alist)
-(setq file-name-handler-alist nil)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(setq inhibit-startup-message t)
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
+(push '(background-color . "#232635") default-frame-alist)
+(push '(foreground-color . "#FFFFFF") default-frame-alist)
+(push '(mouse-color . "white") default-frame-alist)
 #+end_src
 
-** Disable site-run-file
+** make the initial buffer load faster
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
-(setq site-run-file nil)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(setq initial-major-mode 'fundamental-mode)
 #+end_src
 
-** Disable backup files
+** disable backup files
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (setq make-backup-files nil)
 #+end_src
 
-** Disable screen jump
-When the cursor moves out of the screen
+** disable Unnecessary Interface
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
-(setq scroll-conservatively 101)
-#+end_src
-
-** Disable Unnecessary Interface
-It will be faster to disable them here before they've been initialized.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (scroll-bar-mode -1)
 #+end_src
-	 
-* Garbage Collection
-** gc-cons-threshold.
-Use A large gc-cons-threshold may cause freezing
-and stuttering during long-term interactive use.
-
-*** The default value to use for `gc-cons-threshold'. If you experience freezing, decrease this.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(defvar better-gc-cons-threshold 134217728) ; 128mb
-
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold better-gc-cons-threshold)
-            (setq file-name-handler-alist file-name-handler-alist-original)
-            (makunbound 'file-name-handler-alist-original)))
-#+end_src
-
-*** Garbage Collect when Emacs is out of focus and avoid garbage collection when using minibuffer.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (if (boundp 'after-focus-change-function)
-                (add-function :after after-focus-change-function
-                              (lambda ()
-                                (unless (frame-focus-state)
-                                  (garbage-collect))))
-              (add-hook 'after-focus-change-function 'garbage-collect))
-            (defun gc-minibuffer-setup-hook ()
-              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
-
-            (defun gc-minibuffer-exit-hook ()
-              (garbage-collect)
-              (setq gc-cons-threshold better-gc-cons-threshold))
-
-            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
-#+end_src
 
 * Package Management
-** Setup package archives
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(require 'package)
+- =Install straight.el=
 
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-#+end_src
-
-** Configure Package Manager
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(package-initialize)
-
-(unless package-archive-contents
-  (package-refresh-contents))
-#+end_src
-
-** Install use-package
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(eval-and-compile
-  (setq use-package-always-ensure t)
-  (setq use-package-expand-minimally t)
-  (setq use-package-enable-imenu-support t))
-
-(eval-when-compile
-  (require 'use-package)
-  (require 'bind-key))
-#+end_src
-
-** Auto Update
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package auto-package-update
-  :if (not (daemonp))
-  :custom
-  (auto-package-update-interval 7) ;; in days
-  (auto-package-update-prompt-before-update t)
-  (auto-package-update-delete-old-versions t)
-  (auto-package-update-hide-results t)
-  :config
-  (auto-package-update-maybe))
-#+end_src
-
-** Diminish
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package diminish)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+      (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+        "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+        'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 #+end_src
 
 * Base Config
-** Fonts
+** fonts
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(set-face-attribute 'default nil :font "Source Code Pro" :height 100)
-(set-face-attribute 'fixed-pitch nil :font "Source Code Pro" :height 100)
-(set-face-attribute 'variable-pitch nil :font "Source Code Pro" :height 100)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(set-face-attribute 'default nil
+                    :font "JetBrains Mono"
+                    :height 100
+                    :weight 'ultra-light)
+
+(set-face-attribute 'fixed-pitch nil
+                    :font "JetBrains Mono"
+                    :height 100
+                    :weight 'ultra-light)
+
+(set-face-attribute 'variable-pitch nil
+                    :font "JetBrains Mono"
+                    :height 100
+                    :weight 'ultra-light)
 #+end_src
 
-** Encoding
+** default coding system
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(prefer-coding-system 'utf-8)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 #+end_src
 
-** Cursor
+** cursor
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (setq-default evil-normal-state-cursor '(box "medium sea green")
               evil-insert-state-cursor '(bar "medium sea green")
               evil-visual-state-cursor '(hollow "orange")
               blink-cursor-mode nil)
 #+end_src
 
-** Column Number
+** column number
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+- =enable column number mode=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (column-number-mode)
+#+end_src
 
-;; Enable line numbers for some modes
+- =Enable line numbers for some modes=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (dolist (mode '(text-mode-hook
                 prog-mode-hook
                 conf-mode-hook))
   (add-hook mode (lambda ()
                    (display-line-numbers-mode 1)
                    (setq-default display-line-numbers-type 'relative))))
-
-(dolist (mode '(org-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
-** Parentheses
+** scrolling
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(show-paren-mode 1)
-(electric-pair-mode 1)
+- =Make scrolling less stuttered=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq auto-window-vscroll nil)
+(setq fast-but-imprecise-scrolling t)
+(setq scroll-conservatively 101)
+(setq scroll-margin 0)
+(setq scroll-preserve-screen-position t)
 #+end_src
 
-** Auto-revert
-*** Revert Dired and other buffers
+** prompts
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(setq global-auto-revert-non-file-buffers t)
-#+end_src
-
-*** Revert buffers when the underlying file has changed
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(global-auto-revert-mode 1)
-#+end_src
-
-** Make ESC quit prompts
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+- =Make ESC quit prompts=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+end_src
 
-** Simplify Yes/No Prompts
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+- =Use "y" and "n" to confirm/negate prompt instead of "yes" and "no"=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (fset 'yes-or-no-p 'y-or-n-p)
-(setq use-dialog-box nil)
-#+end_src
-
-** Smooth Scrolling
-*** Vertical Scroll
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(setq scroll-step 1)
-(setq scroll-margin 1)
-(setq scroll-conservatively 101)
-(setq scroll-up-aggressively 0.01)
-(setq scroll-down-aggressively 0.01)
-(setq auto-window-vscroll nil)
-(setq fast-but-imprecise-scrolling nil)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-(setq mouse-wheel-progressive-speed nil)
-#+end_src
-
-*** Horizontal Scroll
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(setq hscroll-step 1)
-(setq hscroll-margin 1)
-#+end_src
-
-** Fullscreen
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(custom-set-variables
- '(initial-frame-alist (quote ((fullscreen . maximized)))))
-#+end_src
-
-** Visual Fill
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package visual-fill-column
-  :hook ((org-mode prog-mode) . (lambda ()
-				  (setq visual-fill-column-width 120
-					visual-fill-column-center-text t)
-				  (visual-fill-column-mode 1))))
 #+end_src
 
 ** Transparecy
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
 (add-to-list 'default-frame-alist '(alpha . (95 . 95)))
 #+end_src
 
+** gc
+
+- =Make GC pauses faster by decreasing the threshold=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq gc-cons-threshold (* 2 1000 1000))
+#+end_src
+
 ** Let it snow in Emacs!
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package snow)
-#+end_src
-
-* Theme
-** Doom Theme
-+ 'doom-themes-enable-bold' - if nil, bold is universally disabled
-+ 'doom-themes-enable-italic' - if nil, italics is universally disabled
-+ 'doom-themes-visual-bell-config' - Enable flashing mode-line on errors
-+ 'doom-themes-treemacs-theme' - use "doom-colors" for less minimal icon theme
-+ 'doom-themes-org-config' - Corrects (and improves) org-mode's native fontification.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package doom-themes
-  :config
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (load-theme 'doom-one t)
-  (doom-themes-visual-bell-config)
-  (setq-default doom-themes-treemacs-theme "doom-atom")
-  (doom-themes-treemacs-config)
-  (doom-themes-org-config))
-#+end_src
-
-* Icons
-** All-the-icons
-NOTE: The first time you load your configuration on a new machine, you'll
-need to run the following command interactively so that mode line icons
-display correctly:
-M-x all-the-icons-install-fonts
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package all-the-icons)
-#+end_src
-
-* Dashboard
-** Dashboard
-
-An extensible emacs startup screen showing you what’s most important.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package dashboard
-  :init
-  (setq dashboard-banner-logo-title "Welcome to Emacs!")
-  (setq dashboard-startup-banner 'logo)
-  (setq dashboard-center-content t)
-  (setq dashboard-items '((recents  . 10)
-                          (bookmarks . 10)
-                          (projects . 5)))
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-set-navigator t)
-  ;; (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
-  :config
-  (dashboard-setup-startup-hook))
-#+end_src
-
-** Dashboard in Emacsclient
-
-This setting ensures that emacsclient always opens on dashboard rather than scratch.
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-#+end_src
-
-* Modeline
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom
-  (doom-modeline-height 25)
-  (doom-modeline-persp-name nil))
-#+end_src
-
-* Sudo Edit
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package sudo-edit
-  :commands (sudo-edit))
-#+end_src
-
-* Which-Key
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package which-key
-  :init
-  (which-key-mode)
-  (which-key-setup-minibuffer)
-  (which-key-show-major-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 0.3))
-#+end_src
-
-* General Keybindings
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package general
-  :init
-  (setq-default general-override-states '(insert
-                                          emacs
-                                          hybrid
-                                          normal
-                                          visual
-                                          motion
-                                          operator
-                                          replace))
-  :config
-  (general-evil-setup t))
-#+end_src
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  ","     '(persp-switch-to-buffer* :which-key "workspace beffer")
-  "."     '(consult-buffer :which-key "switch beffer")
-  ":"     '(execute-extended-command :which-key "M-x")
-  ;;"s"     '(treemacs :which-key "treemacs")
-
-  "c"     '(:ignore t :which-key "comments")
-  "c l"   '(comment-line :whick-key "comment or uncomment line")
-  "c r"   '(comment-or-uncomment-region :which-key "comment or uncomment region")
-
-  "e"     '(:ignore t :which-key "eval")
-  "e l"   '(eval-last-sexp :which-key "last sexp")
-
-  "q"     '(:ignore t :which-key "quit")
-  "q q"   '(save-buffers-kill-terminal :which-key "exit emacs")
-  "q k"   '(kill-emacs :which-key "kill emacs")
-  )
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'snow)
 #+end_src
 
 * Evil
-** undo-tree
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package undo-tree
-  :config
-  (global-undo-tree-mode))
-#+end_src
-
-** undo-fu
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package undo-fu)
-#+end_src
-
 ** evil
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-undo-system 'undo-fu)
-  :config
-  (evil-mode 1))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'evil)
+#+end_src
+
+  - =Set some variables that must be configured before loading the package=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq evil-want-integration t
+    evil-want-keybinding nil
+    ;; evil-want-C-u-scroll t
+    ;; evil-want-C-i-jump nil
+    evil-respect-visual-line-mode t
+    evil-undo-system 'undo-tree)
+#+end_src
+
+  - =Load Evil and enable it globally=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(require 'evil)
+(evil-mode 1)
+#+end_src
+
+  - =Use visual line motions even outside of visual-line-mode buffers=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+;; (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+;; (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+#+end_src
+
+- =Make sure some modes start in Emacs state=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(dolist (mode '(custom-mode
+                eshell-mode
+                term-mode))
+  (add-to-list 'evil-emacs-state-modes mode))
+#+end_src
+
+- =set leader key in normal state=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-set-leader 'normal (kbd "SPC"))
+#+end_src
+
+- =set local leader in normal state for dired-mode=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-set-leader 'normal (kbd "M-SPC") t)
+#+end_src
+
+** undo-tree
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'undo-tree)
+#+end_src
+
+  - =Turn on undo-tree globally=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(global-undo-tree-mode)
 #+end_src
 
 ** evil-collection
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package evil-collection
-  :after evil
-  :config
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'evil-collection)
+#+end_src
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(with-eval-after-load "evil"
   (evil-collection-init))
 #+end_src
 
-** evil shift
+** evil-nerd-commenter
 
-Keep text selected after indentation
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'evil-nerd-commenter)
+#+end_src
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(defun my/evil-shift-right ()
+- =Set a global binding for better line commenting/uncommenting=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
+#+end_src
+
+** keep text selected after indentation
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(defun bk/evil-shift-right ()
   (interactive)
   (evil-shift-right evil-visual-beginning evil-visual-end)
   (evil-normal-state)
   (evil-visual-restore))
 
-(defun my/evil-shift-left ()
+(defun bk/evil-shift-left ()
   (interactive)
   (evil-shift-left evil-visual-beginning evil-visual-end)
   (evil-normal-state)
   (evil-visual-restore))
 
-(evil-define-key 'visual global-map (kbd ">") 'my/evil-shift-right)
-(evil-define-key 'visual global-map (kbd "<") 'my/evil-shift-left)
+(evil-define-key 'visual global-map (kbd ">") 'bk/evil-shift-right)
+(evil-define-key 'visual global-map (kbd "<") 'bk/evil-shift-left)
+#+end_src
+
+* UI
+** icons
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'all-the-icons)
+#+end_src
+
+** theme
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'doom-themes)
+
+(setq doom-themes-enable-bold t
+      doom-themes-enable-italic t
+      doom-themes-visual-bell-config nil)
+      ;;doom-themes-org-config)
+
+(load-theme 'doom-one t)
+#+end_src
+
+** modeline
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'doom-modeline)
+
+;; Start up the modeline after initialization is finished
+(require 'doom-modeline)
+(doom-modeline-mode 1)
+
+(setq doom-modeline-height 20)
+#+end_src
+
+** dashboard
+*** Dashboard
+
+An extensible emacs startup screen showing you what’s most important.
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'dashboard)
+
+(setq dashboard-banner-logo-title "Welcome to Emacs!"
+      dashboard-startup-banner 'logo
+      dashboard-center-content t
+      dashboard-items '((recents  . 10)
+			(bookmarks . 10))
+			;;(projects . 5))
+      dashboard-set-heading-icons t
+      dashboard-set-file-icons t
+      dashboard-set-navigator t)
+
+(dashboard-setup-startup-hook)
+#+end_src
+
+*** Dashboard in Emacsclient
+
+- =This setting ensures that emacsclient always opens on dashboard rather than scratch.=
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+#+end_src
+
+** helpful
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'helpful)
+
+;; Make `describe-*' screens more helpful!
+(require 'helpful)
+
+;; (global-set-key [remap describe-function] #'helpful-callable)
+;; (global-set-key [remap describe-variable] #'helpful-variable)
+;; (global-set-key [remap describe-key] #'helpful-key)
+;; (global-set-key (kbd "C-h F") #'helpful-function)
+;; (global-set-key (kbd "C-h C") #'helpful-command)
+
+(evil-define-key 'normal 'global
+  (kbd "<leader>hF") #'helpful-function
+  (kbd "<leader>hC") #'helpful-command)
+#+end_src
+
+** visual fill
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'visual-fill-column)
+
+(dolist (mode '(org-mode-hook
+                prog-mode-hook))
+  (add-hook mode (lambda ()
+		   (setq visual-fill-column-width 120
+			 visual-fill-column-center-text t)
+		   (visual-fill-column-mode 1))))
+#+end_src
+
+* Buffers
+** reverts
+
+- =Revert Dired and other buffers=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq global-auto-revert-non-file-buffers t)
+#+end_src
+
+- =Revert buffers when the underlying file has changed=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(global-auto-revert-mode 1)
+#+end_src
+
+** map
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal 'global
+  (kbd "<leader>fs") 'save-buffer
+
+  (kbd "<leader>bk") 'kill-this-buffer
+  (kbd "<leader>bK") 'kill-buffer
+  (kbd "<leader>bw") 'kill-buffer-and-window
+
+  (kbd "<leader>bj") 'consult-bookmark
+  (kbd "<leader>bs") 'bookmark-set
+
+  (kbd "<leader>dd") 'dired
+  (kbd "<leader>dj") 'dired-jump
+
+  (kbd "<leader>wv") 'evil-window-vsplit
+  (kbd "<leader>ws") 'evil-window-split
+  (kbd "<leader>wh") 'evil-window-left
+  (kbd "<leader>wl") 'evil-window-right
+  (kbd "<leader>wj") 'evil-window-down
+  (kbd "<leader>wk") 'evil-window-up
+  (kbd "<leader>wd") 'delete-window
+  (kbd "<leader>w=") 'balance-window
+  (kbd "<leader>w+") 'evil-window-increase-height
+  (kbd "<leader>w-") 'evil-window-decrease-height
+  (kbd "<leader>w>") 'evil-window-increase-width
+  (kbd "<leader>w<") 'evil-window-decrease-width)
+#+end_src
+
+* Tab Bar
+
+#+begin_src emacs-lisp
+;; (setq tab-bar-show nil
+;;       tab-bar-close-button-show nil
+;;       tab-bar-new-button-show nil)
+
+;; (setq tab-bar-new-tab-choice "*dashboard*")
+
+;; (defun bk/show-current-tab-name ()
+;;   (alist-get 'name (tab-bar--current-tab)))
+
+;; (tab-bar-mode 1)
+#+end_src
+
+- =keybindings=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+;; (evil-define-key 'normal 'global
+;;   (kbd "<leader>t.") 'tab-bar-select-tab-by-name
+;;   (kbd "<leader>tc") 'bk/show-current-tab-name
+;;   (kbd "<leader>tn") 'tab-bar-tab-name-function
+;;   (kbd "<leader>tk") 'tab-close
+;;   (kbd "<leader>tK") 'tab-close-other
+;;   (kbd "<leader>tu") 'tab-bar-undo-close-tab
+;;   (kbd "<leader>tr") 'tab-rename
+;;   (kbd "<leader>tn") 'tab-new)
+#+end_src
+
+* Terminal
+** vterm
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'vterm)
+
+(evil-define-key 'normal 'global
+  (kbd "<leader>tt") 'vterm)
 #+end_src
 
 * Dired
-** Diredfl
+** diredfl
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package diredfl
-  :hook (dired-mode . diredfl-mode))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'diredfl)
+(add-hook 'dired-mode-hook 'diredfl-mode)
 #+end_src
 
-** Rainbow
+** rainbow
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package dired-rainbow
-  :defer 2
-  :config
-  (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
-  (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
-  (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
-  (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
-  (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
-  (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
-  (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
-  (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
-  (dired-rainbow-define log "#c17d11" ("log"))
-  (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
-  (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
-  (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
-  (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
-  (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
-  (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
-  (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
-  (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
-  (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
-  (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
-  (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'dired-rainbow)
+
+(require 'dired-rainbow)
+
+(with-eval-after-load "dired"
+  (progn
+    (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+    (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+    (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+    (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+    (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+    (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+    (dired-rainbow-define media "#de751f" ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac" "mkv"))
+    (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+    (dired-rainbow-define log "#c17d11" ("log"))
+    (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+    (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+    (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+    (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+    (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+    (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+    (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+    (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+    (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+    (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*")
+    ))
 #+end_src
 
-** Map
+** dired-open
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'dired-open)
+
+(require 'dired-open)
+
+(with-eval-after-load "dired"
+  (setq dired-open-extensions
+        '(("mkv" . "mpv")
+          ("mp4" . "mpv")
+          ("avi" . "mpv")
+          ("html" . "firefox")
+          )))
+#+end_src
+
+** dired icons
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'all-the-icons-dired)
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+
+;;(use-package all-the-icons-dired
+;;  :if (display-graphic-p)
+;;  :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+** bookmarks
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq bookmark-default-file "~/emacs-bookmarks")
+#+end_src
+
+** map
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (evil-collection-define-key 'normal 'dired-mode-map
   "h" 'dired-up-directory
   "l" 'dired-find-file)
 #+end_src
 
-** Dired Icons
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal dired-mode-map
+  (kbd "<localleader>fs") 'save-buffer
+  (kbd "<localleader>ff") 'find-file
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package all-the-icons-dired
-  :if (display-graphic-p)
-  :hook (dired-mode . all-the-icons-dired-mode))
-#+end_src
+  (kbd "<localleader>.") 'persp-switch-to-buffer*
+  (kbd "<localleader>,") 'consult-buffer
 
-** Keybinds
+  (kbd "<localleader>tt") 'vterm
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  ;;"d"   '(:ignore t :whick-key "dired")
-  "d d" '(dired :which-key "open dired")
-  "d j" '(dired-jump :which-key "dired jump")
-  "d o" '(openwith-mode :whick-key "openwith-mode")
-  )
-#+end_src
+  (kbd "<localleader>bK") 'kill-buffer
+  (kbd "<localleader>bk") 'kill-this-buffer
+  (kbd "<localleader>bw") 'kill-buffer-and-window
 
-* Files
-** pdf
+  (kbd "<localleader>bj") 'consult-bookmark
+  (kbd "<localleader>bs") 'bookmark-set
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package pdf-tools
-  :config
-  (pdf-tools-install)
-  (setq-default pdf-view-display-size 'fit-page))
-#+end_src
+  (kbd "<localleader><tab>n") 'persp-next
+  (kbd "<localleader><tab>p") 'persp-prev
+  (kbd "<localleader><tab>k") 'persp-kill
+  (kbd "<localleader><tab>b") 'persp-kill-buffer* ; kill perspective buffer
+  (kbd "<localleader><tab>K") 'persp-kill-others
+  (kbd "<localleader><tab>l") 'persp-switch-last
+  (kbd "<localleader><tab>.") 'persp-switch ; switch by name
+  (kbd "<localleader><tab>r") 'persp-remove-buffer ; remove buffer from current perspective
+  (kbd "<localleader><tab>R") 'persp-rename
+  (kbd "<localleader><tab>s") 'persp-state-save ; save persp
+  (kbd "<localleader><tab>L") 'persp-state-load ; load persp
 
-** Keybinds
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  "f"     '(:ignore t :which-key "files")
-  "f d"   '(delete-file :whick-key "delete file")
-  "f l"   '((lambda () (interactive) (load-file "~/.emacs.d/init.el")) :whick-key "reload emacs config")
-  "f s"   '(save-buffer :whick-key "save file")
-  "f f"   '(find-file :which-key "find file")
-  )
-#+end_src
-
-* Buffers and Bookmarks
-** Keybinds
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  "RET"   '(:ignore t :which-key "bookmark")
-  "RET j" '(consult-bookmark :which-key "bookmark jump")
-  "RET s" '(bookmark-set :which-key "bookmark set")
-
-  "b"     '(:ignore t :which-key "buffers")
-  "b k"   '(kill-buffer :which-key "kill buffer")
-  "b w"   '(kill-buffer-and-window :which-key "kill buffer and window")
-
-  "w"     '(:ignore t :which-key "windows")
-  "w b"   '(evil-window-bottom-right :which-key "window bottom right")
-  "w d"   '(evil-window-delete :which-key "delete window")
-  "w s"   '(evil-window-split :which-key "split window")
-  "w v"   '(evil-window-vsplit :which-key "vsplit window")
-  "w h"   '(evil-window-left :which-key "left window")
-  "w l"   '(evil-window-right :which-key "right window")
-  "w j"   '(evil-window-down :which-key "down window")
-  "w k"   '(evil-window-up :which-key "up window")
-  "w ="   '(balance-windows :which-key "balance windows")
-  "w +"   '(evil-window-increase-height :which-key "increase window height")
-  "w -"   '(evil-window-decrease-height :which-key "decrease window height")
-  "w >"   '(evil-window-increase-width :which-key "increase window width")
-  "w <"   '(evil-window-decrease-width :which-key "decrease window widht")
-  "w t"   '(evil-window-top-left :which-key "window top left")
-  )
-#+end_src
-
-* Workspaces
-** persp-mode
-+ 'persp-modestring-short' - only displays the current perspective
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package perspective
-  :demand t
-  :custom
-  (persp-initial-frame-name "main")
-  :config
-  ;;(persp-turn-off-modestring)
-  (setq-default persp-modestring-short t
-		persp-state-default-file "~/persp")
-  ;; Running `persp-mode' multiple times resets the perspective list...
-  (unless (equal persp-mode t)
-    (persp-mode)))
-#+end_src
-
-** Keybinds
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  "TAB"   '(:ignore t :which-key "workspaces")
-  "TAB n" '(persp-next :which-key "next perspective")
-  "TAB p" '(persp-prev :which-key "prev perspective")
-  "TAB k" '(persp-kill :which-key "kill perspective")
-  "TAB b" '(persp-kill-buffer* :which-key "kill perspective buffer")
-  "TAB K" '(persp-kill-others :which-key "kill other perspectives")
-  "TAB l" '(persp-switch-last :which-key "switch last perspectives")
-  "TAB ." '(persp-switch :which-key "switch by name")
-  "TAB s" '(persp-state-save :which-key "save persp")
-  "TAB L" '(persp-state-load :which-key "load persp")
-  )
+  (kbd "<localleader>wv") 'evil-window-vsplit
+  (kbd "<localleader>ws") 'evil-window-split
+  (kbd "<localleader>wh") 'evil-window-left
+  (kbd "<localleader>wl") 'evil-window-right
+  (kbd "<localleader>wj") 'evil-window-down
+  (kbd "<localleader>wk") 'evil-window-up
+  (kbd "<localleader>wd") 'evil-window-delete
+  (kbd "<localleader>qq") 'kill-emacs
+  (kbd "<localleader>wq") 'save-buffers-kill-emacs)
 #+end_src
 
 * Org
-** Org-mode
+** org-mode
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package org
-  :hook (org-mode . (lambda ()
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'org)
+;; (straight-use-package '(org :type built-in))
+
+(add-hook 'org-mode-hook (lambda ()
                       (org-indent-mode)
                       (variable-pitch-mode 1)
                       (auto-fill-mode 0)
                       (visual-line-mode 1)
-                      (setq evil-auto-indent nil)
-                      (diminish org-indent-mode)))
-  :config
-  (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t
-        org-src-preserve-indentation t
-        org-startup-folded t))
+                      (setq evil-auto-indent nil)))
+
+(setq org-ellipsis " ▾"
+    org-hide-emphasis-markers t
+    org-src-preserve-indentation t
+    org-startup-folded t)
 #+end_src
 
-** Superstar
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode)
-  :custom
-  (org-superstar-remove-leading-stars t)
-  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+- =disable number mode for org-mode=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(dolist (mode '(org-mode-hook))
+  (add-hook mode (lambda ()
+                   (display-line-numbers-mode 0))))
 #+end_src
 
-** Org Indent
+** superstar
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'org-superstar)
+
+(with-eval-after-load "org"
+  (add-hook 'org-mode-hook 'org-superstar-mode)
+
+  (setq org-superstar-remove-leading-stars t
+	org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+end_src
+
+** org indent
+
 Make sure org-indent face is available
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (require 'org-indent)
 
 ;; Ensure that anything that should be fixed-pitch in Org files appears that way
@@ -689,39 +653,25 @@ Make sure org-indent face is available
 (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 #+end_src
 
-** Rid of the background
+** rid of the background
+
 Get rid of the background on column views
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (set-face-attribute 'org-column nil :background nil)
 (set-face-attribute 'org-column-title nil :background nil)
 #+end_src
 
-** Roam
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package org-roam
-  :ensure t
-  :init
-  (setq org-roam-v2-ack t)
-  :custom
-  (org-roam-directory (file-truename "~/roam/"))
-  (org-roam-compilation-everywhere t)
-  :bind (("C-c n i" . org-roam-node-insert))
-  :config
-  (org-roam-db-autosync-mode))
-#+end_src
-
-** Babel
+** babel
 *** Confirm Evaluate
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (setq org-confirm-babel-evaluate nil)
 #+end_src
 
 *** Load languages
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -729,248 +679,357 @@ Get rid of the background on column views
    (shell . t)))
 #+end_src
 
-** Toc-Org
+** structure templates
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package toc-org
-  :hook ((org-mode . toc-org-mode)))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(require 'org-tempo)
+
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("p" . "src python"))
+(add-to-list 'org-structure-template-alist '("cf" . "src conf"))
+(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("yl" . "src yaml"))
+(add-to-list 'org-structure-template-alist '("vr" . "src vimrc"))
+(add-to-list 'org-structure-template-alist '("scc" . "src scc"))
 #+end_src
 
-** Vimrc
+** toc-org
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package vimrc-mode
-  :after org)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'toc-org)
+
+(add-hook 'org-mode-hook 'toc-org-mode)
 #+end_src
 
-** Keybinds
+** map
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'org-mode-map :prefix "SPC"
-  "o"     '(:ignore t :which-key "org")
-  "o t"   '(org-insert-structure-template :whick-key "template")
-  "o b"   '(:ignore t :whick-key "babel")
-  "o b t" '(org-babel-tangle :whick-key "tangle")
-  "o r"   '(:ignore t :which-key "roam")
-  "o r t" '(org-roam-buffer-toggle :whick-key "toggle buffer")
-  "o r f" '(org-roam-node-find :which-key "node find")
-  "o r g" '(org-roam-graph :which-key "graph")
-  "o r i" '(org-roam-node-insert :which-key "node insert")
-  "o r c" '(org-roam-capture :which-key "capture")
-  "o r o" '(org-open-at-point :which-key "open at point")
-  "o r d" '(org-roam-dailies-capture-today :which-key "dailies capture today")
-  "o r w" '(org-capture-finalize :which-key "finalize")
-  )
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal org-mode-map
+  ">" 'org-shiftmetaright
+  "<" 'org-shiftmetaleft
+  (kbd "<leader>obt") 'org-babel-tangle)
 #+end_src
 
-* Vertico
-** Vertico
-+ 'vertico-resize' - Grow and shrink the Vertico minibuffer.
-+ 'vertico-cycle' - Optionally enable cycling for `vertico-next' and `vertico-previous'.
+* Files
+** sudo-edit
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package vertico
-  :init
-  (vertico-mode)
-  (setq vertico-resize t)
-  (setq vertico-cycle t))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'sudo-edit)
 #+end_src
 
-** Consult
+** pdf
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package consult)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'pdf-tools)
+(pdf-tools-install)
+(setq-default pdf-view-display-size 'fit-page)
 #+end_src
 
-** Orderless
-Use the `orderless' completion style. Additionally enable
-`partial-completion' for file path expansion. `partial-completion' is
-important for wildcard support. Multiple files can be opened at once
-with `find-file' if you enter a wildcard. You may also give the
-`initials' completion style a try.
+** recent files
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package orderless
-  :init
-  (setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(recentf-mode 1)
 #+end_src
 
-** Savehist
-Persist history over Emacs restarts. Vertico sorts by history position.
+** map
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package savehist
-  :init
-  (savehist-mode))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal 'global
+  (kbd "<leader>ff") 'find-file
+  (kbd "<leader>fr") 'recentf-open-files)
 #+end_src
 
-** Emacs
-A few more useful configurations.
-+ 'completing-read-multiple' - Add prompt indicator
-+ 'consult-completing-read-multiple' - Alternatively add prompt indicator
+* Workspaces
+** persp-mode
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package emacs
-  :init
-  (defun crm-indicator (args)
-    (cons (concat "[CRM] " (car args)) (cdr args)))
-    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+- ='persp-modestring-short'= - only displays the current perspective
 
-    ;; Do not allow the cursor in the minibuffer prompt
-    (setq minibuffer-prompt-properties
-          '(read-only t cursor-intangible t face minibuffer-prompt))
-    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'perspective)
 
-    ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-    ;; Vertico commands are hidden in normal buffers.
-    ;; (setq read-extended-command-predicate
-    ;;       #'command-completion-default-include-p)
+(setq-default persp-modestring-short t
+              persp-initial-frame-name "main"
+              persp-state-default-file "~/.persp")
 
-    (setq enable-recursive-minibuffers t))
+;; Running `persp-mode' multiple times resets the perspective list...
+(unless (equal persp-mode t)
+  (persp-mode))
 #+end_src
 
-** Marginalia
+** map
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package marginalia
-  :init
-  (marginalia-mode))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal 'global
+  (kbd "<leader>.") 'persp-switch-to-buffer*
+
+  (kbd "<leader><tab>n") 'persp-next
+  (kbd "<leader><tab>p") 'persp-prev
+  (kbd "<leader><tab>k") 'persp-kill
+  (kbd "<leader><tab>b") 'persp-kill-buffer* ; kill perspective buffer
+  (kbd "<leader><tab>K") 'persp-kill-others
+  (kbd "<leader><tab>l") 'persp-switch-last
+  (kbd "<leader><tab>.") 'persp-switch ; switch by name
+  (kbd "<leader><tab>r") 'persp-remove-buffer ; remove buffer from current perspective
+  (kbd "<leader><tab>R") 'persp-rename
+  (kbd "<leader><tab>s") 'persp-state-save ; save persp
+  (kbd "<leader><tab>L") 'persp-state-load) ; load persp
 #+end_src
 
-* Terminal
-** Vterm
+* Completion
+** vertico
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package vterm)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'vertico)
+
+(vertico-mode 1)
+(customize-set-variable 'vertico-cycle t)
+
+(require 'vertico)
+(require 'vertico-directory "extensions/vertico-directory.el")
+
+(with-eval-after-load "evil"
+  (define-key vertico-map (kbd "C-j") 'vertico-next)
+  (define-key vertico-map (kbd "C-k") 'vertico-previous)
+  (define-key vertico-map [backspace] 'vertico-directory-delete-char))
 #+end_src
 
-** Keybinds
+** marginalia
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  "t"   '(:ignore t :which-key "term")
-  "t e" '(eshell :whick-key "eshell")
-  "t v" '(vterm :whick-key "vterm")
-  "t t" '(term :whick-key "term")
-  )
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'marginalia)
+(setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+(marginalia-mode 1)
 #+end_src
 
-* Git
-** Magit
+** orderless
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package magit)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'orderless)
+
+(require 'orderless)
+(customize-set-variable 'completion-styles '(orderless))
+(customize-set-variable 'completion-category-overrides '((file (styles . (partial-completion)))))
+(setq completion-category-defaults nil)
 #+end_src
 
-** diff-hl
+** consult
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package diff-hl
-  :init
-  (global-diff-hl-mode)
-  (diff-hl-flydiff-mode)
-  :hook ((magit-pre-refresh-hook . diff-hl-magit-pre-refresh)
-         (magit-post-refresh-hook . diff-hl-magit-post-refresh)))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'consult)
+
+(global-set-key (kbd "C-s") 'consult-line)
+(define-key minibuffer-local-map (kbd "C-r") 'consult-history)
+
+(setq completion-in-region-function #'consult-completion-in-region)
 #+end_src
 
-** Keybinds
+- =keybindings=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(define-key minibuffer-local-map (kbd "C-r") 'consult-history)
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  "g"     '(:ignore t :which-key "git")
-  "g l"   '(:ignore t :which-key "log")
-  "g l c" '(magit-log-current :which-key "log current")
-  "g l f" '(magit-log-buffer-file :which-key "log buffer file")
-  "g c"   '(magit-commit :which-key "commit")
-  "g s"   '(magit-status :which-key "status")
-  "g d"   '(magit-diff-unstaged :which-key "diff unstaged")
-  "g c"   '(magit-branch-or-checkout :which-key "branch or checkout")
-  "g b"   '(magit-branch :which-key "branch")
-  "g p"   '(magit-push-current :which-key "push current")
-  "g P"   '(magit-pull-branch :which-key "pull branch")
-  "g f"   '(magit-fetch :which-key "fetch")
-  "g F"   '(magit-fetch-all :which-key "fetch all")
-  "g r"   '(magit-rebase :which-key "rebase")
-  )
+(evil-define-key 'normal 'global
+  (kbd "<leader>,") 'consult-buffer)
+#+end_src
+
+** embark
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'embark)
+
+(global-set-key [remap describe-bindings] #'embark-bindings)
+(global-set-key (kbd "C-.") 'embark-act)
+
+;; Use Embark to show bindings in a key prefix with `C-h`
+(setq prefix-help-command #'embark-prefix-help-command)
+#+end_src
+
+** embark-consult
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'embark-consult)
+
+(with-eval-after-load "embark consult"
+  (add-hook 'embark-collect-mode 'consult-preview-at-point-mode))
+#+end_src
+
+** savehist
+
+- =Persist history over Emacs restarts. Vertico sorts by history position=
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(savehist-mode 1)
+#+end_src
+
+** minibuffer backward kill
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+;;(defun bk/minibuffer-backward-kill (arg)
+(defun rational-completion/minibuffer-backward-kill (arg)
+  "When minibuffer is completing a file name delete up to parent
+folder, otherwise delete a word"
+  (interactive "p")
+  (if minibuffer-completing-file-name
+      ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
+      (if (string-match-p "/." (minibuffer-contents))
+          (zap-up-to-char (- arg) ?/)
+        (delete-minibuffer-contents))
+    (backward-kill-word arg)))
+#+end_src
+
+* Editing
+** ws-butler
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'ws-butler)
+
+;; Set up ws-butler for trimming whitespace and line endings
+(add-hook 'text-mode-hook 'ws-butler-mode)
+(add-hook 'prog-mode-hook 'ws-butler-mode)
+#+end_src
+
+** kill-ring
+
+- =Do not saves duplicates in kill-ring=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq kill-do-not-save-duplicates t)
+#+end_src
+
+** space/tabs
+
+- =Use spaces instead of tabs=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(setq-default indent-tabs-mode nil)
+#+end_src
+
+** save-place
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(save-place-mode 1)
+#+end_src
+
+** parentheses
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(show-paren-mode 1)
+(electric-pair-mode 1)
 #+end_src
 
 * Company
 ** company
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package company
-  :hook (after-init . global-company-mode)
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0))
-#+end_src
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'company)
 
-** company-shell
+(add-hook 'after-init-hook 'global-company-mode)
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package company-shell
-  :after sh-script
-  :custom (add-to-list 'company-backends 'company-shell))
+(setq company-minimum-prefix-length 3)
+(setq company-idle-delay 0.3)
 #+end_src
 
 ** company-box
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package company-box
-  :hook (company-mode . company-box-mode))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'company-box)
+(add-hook 'company-mode-hook 'company-box-mode)
 #+end_src
 
-* Projectile
+* Coding
+** git
+*** Magit
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode +1)
-  ;; :custom ((projectile-completion-system 'ivy))
-  :bind-keymap ("C-c p" . projectile-command-map)
-  :init
-  ;; (when (file-directory-p "~/Dev")
-  ;; 	(setq projectile-project-search-path '("~/Dev")))
-  (setq projectile-switch-project-action #'projectile-dired))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'magit)
 #+end_src
 
-** Keybinds
+*** diff-hl
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(nvmap :keymaps 'override :prefix "SPC"
-  "p"     '(:ignore t :which-key "projectile")
-  "p f"   '(projectile-find-file :whick-key "find file")
-  "p p"   '(projectile-switch-project :whick-key "switch project")
-  "p k"   '(projectile-kill-buffers :whick-key "kill project buffers")
-  )
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'diff-hl)
+
+(global-diff-hl-mode 1)
+(diff-hl-flydiff-mode 1)
+
+(add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
 #+end_src
 
-* Flycheck
+*** Keybinds
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package flycheck
-  :config
-  (add-to-list 'flycheck-check-syntax-automatically 'idle-change))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal 'global
+  (kbd "<leader>glc") 'magit-log-current
+  (kbd "<leader>glf") 'magit-log-buffer-file
+  (kbd "<leader>gc") 'magit-commit
+  (kbd "<leader>gs") 'magit-status
+  (kbd "<leader>gdu") 'magit-diff-unstaged
+  (kbd "<leader>gc") 'magit-branch-or-checkout
+  (kbd "<leader>gb") 'magit-branch
+  (kbd "<leader>gp") 'magit-push-current
+  (kbd "<leader>gP") 'magit-pull-branch
+  (kbd "<leader>gf") 'magit-fetch
+  (kbd "<leader>gF") 'magit-fetch-all
+  (kbd "<leader>gr") 'magit-rebase)
 #+end_src
 
-* Python
+** YASnippet
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package python-mode)
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'yasnippet)
+(straight-use-package 'yasnippet-snippets)
+
+(require 'yasnippet)
+
+(yas-global-mode 1)
 #+end_src
 
-* Rust
-** Rust Mode
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package rust-mode)
+- =keybindings=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal 'global
+  (kbd "<leader>ydt") 'yas-describe-tables)
 #+end_src
 
-** Cargo
+** rust
+*** Rust Mode
 
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-(use-package cargo
-  :hook ((rust-mode . cargo-minor-mode)))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'rust-mode)
+#+end_src
+
+*** Cargo
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'cargo)
+(add-hook 'rust-mode-hook 'cargo-minor-mode)
+#+end_src
+
+** python
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'python-mode)
+#+end_src
+
+** flycheck
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'flycheck)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(setq flycheck-check-syntax-automatically '(save
+                                            idle-change
+                                            mode-enabled))
+#+end_src
+
+** bash
+
+- =Make shebang (#!) file executable when saved=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+#+end_src
+
+* Emacs
+
+- =keybindings=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(evil-define-key 'normal 'global
+  (kbd "<leader>qq") 'kill-emacs
+  (kbd "<leader>wq") 'save-buffers-kill-emacs)
 #+end_src
