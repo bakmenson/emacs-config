@@ -306,7 +306,8 @@
 (setq doom-themes-enable-bold t
       doom-themes-enable-italic t
       doom-themes-visual-bell-config nil)
-      ;;doom-themes-org-config)
+
+(doom-themes-org-config)
 
 (load-theme 'doom-one t)
 #+end_src
