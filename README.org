@@ -482,7 +482,7 @@ An extensible emacs startup screen showing you what’s most important.
 (add-hook 'dired-mode-hook 'diredfl-mode)
 #+end_src
 
-** rainbow
+** dired-rainbow
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'dired-rainbow)
