@@ -10,7 +10,6 @@
 - [[#evil][Evil]]
 - [[#ui][UI]]
 - [[#buffers][Buffers]]
-- [[#tab-bar][Tab Bar]]
 - [[#terminal][Terminal]]
 - [[#dired][Dired]]
 - [[#org][Org]]
@@ -176,7 +175,7 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+end_src
 
-- =Use "y" and "n" to confirm/negate prompt instead of "yes" and "no"=
+- =Use y and n to confirm/negate prompt instead of yes and no=
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
@@ -252,10 +251,7 @@
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'undo-tree)
-#+end_src
 
-  - =Turn on undo-tree globally=
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (global-undo-tree-mode)
 #+end_src
 
@@ -263,9 +259,7 @@
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'evil-collection)
-#+end_src
 
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (with-eval-after-load "evil"
   (evil-collection-init))
 #+end_src
@@ -274,10 +268,7 @@
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'evil-nerd-commenter)
-#+end_src
 
-- =Set a global binding for better line commenting/uncommenting=
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (global-set-key (kbd "M-/") 'evilnc-comment-or-uncomment-lines)
 #+end_src
 
@@ -325,7 +316,6 @@
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'doom-modeline)
 
-;; Start up the modeline after initialization is finished
 (require 'doom-modeline)
 (doom-modeline-mode 1)
 
@@ -333,9 +323,6 @@
 #+end_src
 
 ** dashboard
-*** Dashboard
-
-An extensible emacs startup screen showing you what’s most important.
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'dashboard)
@@ -353,31 +340,11 @@ An extensible emacs startup screen showing you what’s most important.
 (dashboard-setup-startup-hook)
 #+end_src
 
-*** Dashboard in Emacsclient
-
-- =This setting ensures that emacsclient always opens on dashboard rather than scratch.=
-
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-#+end_src
-
 ** helpful
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'helpful)
-
-;; Make `describe-*' screens more helpful!
 (require 'helpful)
-
-;; (global-set-key [remap describe-function] #'helpful-callable)
-;; (global-set-key [remap describe-variable] #'helpful-variable)
-;; (global-set-key [remap describe-key] #'helpful-key)
-;; (global-set-key (kbd "C-h F") #'helpful-function)
-;; (global-set-key (kbd "C-h C") #'helpful-command)
-
-(evil-define-key 'normal 'global
-  (kbd "<leader>hF") #'helpful-function
-  (kbd "<leader>hC") #'helpful-command)
 #+end_src
 
 ** visual fill
@@ -434,34 +401,6 @@ An extensible emacs startup screen showing you what’s most important.
   (kbd "<leader>w-") 'evil-window-decrease-height
   (kbd "<leader>w>") 'evil-window-increase-width
   (kbd "<leader>w<") 'evil-window-decrease-width)
-#+end_src
-
-* Tab Bar
-
-#+begin_src emacs-lisp
-;; (setq tab-bar-show nil
-;;       tab-bar-close-button-show nil
-;;       tab-bar-new-button-show nil)
-
-;; (setq tab-bar-new-tab-choice "*dashboard*")
-
-;; (defun bk/show-current-tab-name ()
-;;   (alist-get 'name (tab-bar--current-tab)))
-
-;; (tab-bar-mode 1)
-#+end_src
-
-- =keybindings=
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-;; (evil-define-key 'normal 'global
-;;   (kbd "<leader>t.") 'tab-bar-select-tab-by-name
-;;   (kbd "<leader>tc") 'bk/show-current-tab-name
-;;   (kbd "<leader>tn") 'tab-bar-tab-name-function
-;;   (kbd "<leader>tk") 'tab-close
-;;   (kbd "<leader>tK") 'tab-close-other
-;;   (kbd "<leader>tu") 'tab-bar-undo-close-tab
-;;   (kbd "<leader>tr") 'tab-rename
-;;   (kbd "<leader>tn") 'tab-new)
 #+end_src
 
 * Terminal
@@ -553,6 +492,9 @@ An extensible emacs startup screen showing you what’s most important.
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (evil-define-key 'normal dired-mode-map
+  (kbd "<localleader>hF") #'helpful-function
+  (kbd "<localleader>hC") #'helpful-command)
+
   (kbd "<localleader>fs") 'save-buffer
   (kbd "<localleader>ff") 'find-file
 
@@ -632,7 +574,7 @@ An extensible emacs startup screen showing you what’s most important.
 
 ** org indent
 
-Make sure org-indent face is available
+- =Make sure org-indent face is available=
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (require 'org-indent)
@@ -651,7 +593,7 @@ Make sure org-indent face is available
 
 ** rid of the background
 
-Get rid of the background on column views
+- =Get rid of the background on column views=
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (set-face-attribute 'org-column nil :background nil)
@@ -819,7 +761,6 @@ Get rid of the background on column views
 (setq completion-in-region-function #'consult-completion-in-region)
 #+end_src
 
-- =keybindings=
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (define-key minibuffer-local-map (kbd "C-r") 'consult-history)
 
@@ -859,8 +800,7 @@ Get rid of the background on column views
 ** minibuffer backward kill
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-;;(defun bk/minibuffer-backward-kill (arg)
-(defun rational-completion/minibuffer-backward-kill (arg)
+(defun bk/minibuffer-backward-kill (arg)
   "When minibuffer is completing a file name delete up to parent
 folder, otherwise delete a word"
   (interactive "p")
@@ -875,10 +815,10 @@ folder, otherwise delete a word"
 * Editing
 ** ws-butler
 
+- =Set up ws-butler for trimming whitespace and line endings=
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'ws-butler)
 
-;; Set up ws-butler for trimming whitespace and line endings
 (add-hook 'text-mode-hook 'ws-butler-mode)
 (add-hook 'prog-mode-hook 'ws-butler-mode)
 #+end_src
@@ -931,7 +871,7 @@ folder, otherwise delete a word"
 
 * Coding
 ** git
-*** Magit
+*** magit
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'magit)
@@ -949,7 +889,7 @@ folder, otherwise delete a word"
 (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
 #+end_src
 
-*** Keybinds
+*** map
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (evil-define-key 'normal 'global
@@ -976,10 +916,7 @@ folder, otherwise delete a word"
 (require 'yasnippet)
 
 (yas-global-mode 1)
-#+end_src
 
-- =keybindings=
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (evil-define-key 'normal 'global
   (kbd "<leader>ydt") 'yas-describe-tables)
 #+end_src
@@ -1023,7 +960,6 @@ folder, otherwise delete a word"
 
 * Emacs
 
-- =keybindings=
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (evil-define-key 'normal 'global
   (kbd "<leader>qq") 'kill-emacs
