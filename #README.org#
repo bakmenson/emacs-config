@@ -24,7 +24,7 @@
 * Early Init
 ** garbage collection at startup
 
-- =Increase the GC threshold for faster startup=
+- =Increase the GC threshold for faster startup==
   =The default is 800 kilobytes.  Measured in bytes.=
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
@@ -493,7 +493,7 @@
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (evil-define-key 'normal dired-mode-map
   (kbd "<localleader>hF") #'helpful-function
-  (kbd "<localleader>hC") #'helpful-command
+  (kbd "<localleader>hC") #'helpful-command)
 
   (kbd "<localleader>fs") 'save-buffer
   (kbd "<localleader>ff") 'find-file
@@ -735,10 +735,8 @@
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'marginalia)
-
-(with-eval-after-load "vertico"
-  (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  (marginalia-mode 1))
+(setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+(marginalia-mode 1)
 #+end_src
 
 ** orderless
