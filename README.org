@@ -488,7 +488,7 @@
 ** bookmarks
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(setq bookmark-default-file "~/emacs-bookmarks")
+(setq bookmark-default-file "~/.emacs-bookmarks")
 #+end_src
 
 ** map
