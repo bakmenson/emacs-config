@@ -920,20 +920,6 @@ folder, otherwise delete a word"
   (kbd "<leader>gr") 'magit-rebase)
 #+end_src
 
-** YASnippet
-
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(straight-use-package 'yasnippet)
-(straight-use-package 'yasnippet-snippets)
-
-(require 'yasnippet)
-
-(yas-global-mode 1)
-
-(evil-define-key 'normal 'global
-  (kbd "<leader>ydt") 'yas-describe-tables)
-#+end_src
-
 ** rust
 *** Rust Mode
 
