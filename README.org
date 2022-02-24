@@ -846,7 +846,8 @@ folder, otherwise delete a word"
 
 - =Use spaces instead of tabs=
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil
+              tab-width 4)
 #+end_src
 
 ** save-place
