@@ -971,6 +971,12 @@ folder, otherwise delete a word"
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 #+end_src
 
+** quickrun
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'quickrun)
+#+end_src
+
 * Emacs
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
