@@ -676,6 +676,7 @@
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (recentf-mode 1)
+(setq recentf-max-saved-items 50)
 #+end_src
 
 ** map
