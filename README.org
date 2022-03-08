@@ -342,7 +342,6 @@
       dashboard-center-content t
       dashboard-items '((recents  . 10)
 			(bookmarks . 10))
-			;;(projects . 5))
       dashboard-set-heading-icons t
       dashboard-set-file-icons t
       dashboard-set-navigator t)
@@ -974,6 +973,29 @@ folder, otherwise delete a word"
 #+end_src
 
 * EXWM
+** funcs
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(defun bk/call-process (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+(defun bk/shell-command (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'start-process-shell-command (car command-parts) nil command-parts)))
+
+(defun bk/exwm-init-hook ()
+  ;; move to workspace 1 at startup
+  (exwm-workspace-switch-create 1)
+
+  ;; launch apps at startup
+  (bk/call-process "xfce4-power-manager")
+
+  (bk/shell-command "feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*")
+  (bk/shell-command "picom --config ~/.config/picom.conf")
+  (bk/shell-command "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll"))
+#+end_src
+
 ** display time
 
 - =Turn on `display-time-mode' if you don't use an external bar.=
@@ -990,15 +1012,6 @@ folder, otherwise delete a word"
 
 (require 'exwm)
 (require 'exwm-config)
-#+end_src
-
-** workspaces
-
-- =Set the initial number of workspaces (they can also be created later).=
-
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(setq exwm-workspace-number 5)
-(setq exwm-workspace-switch-create 1)
 #+end_src
 
 ** updates workspaces
@@ -1148,13 +1161,18 @@ Hide the minibuffer and echo area.
 (exwm-randr-anable)
 #+end_src
 
-** launch apps
+** workspaces
+
+- =Set the initial number of workspaces (they can also be created later).=
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(start-process-shell-command "feh" nil "feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*")
-(start-process-shell-command "picom" nil "picom --config ~/.config/picom.conf")
-(start-process-shell-command "setxkbmap" nil "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll")
-(start-process-shell-command "" nil "xfce4-power-manager")
+(setq exwm-workspace-number 5)
+#+end_src
+
+** startup
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(add-hook 'exwm-init-hook #'bk/exwm-init-hook)
 #+end_src
 
 ** enable exwm
