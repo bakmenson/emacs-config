@@ -181,13 +181,6 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
-** Transparecy
-
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
-(add-to-list 'default-frame-alist '(alpha . (95 . 95)))
-#+end_src
-
 ** gc
 
 - =Make GC pauses faster by decreasing the threshold=
@@ -347,6 +340,13 @@
       dashboard-set-navigator t)
 
 (dashboard-setup-startup-hook)
+#+end_src
+
+** transparecy
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
+(add-to-list 'default-frame-alist '(alpha . (95 . 95)))
 #+end_src
 
 ** helpful
