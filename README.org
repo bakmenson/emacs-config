@@ -1014,6 +1014,17 @@ folder, otherwise delete a word"
 (require 'exwm-config)
 #+end_src
 
+** desktop-environment
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'desktop-environment)
+
+(desktop-environment-mode)
+
+(setq desktop-environment-volume-normal-decrement "2%-"
+      desktop-environment-volume-normal-increment "2%+")
+#+end_src
+
 ** updates workspaces
 
 All buffers created in EXWM mode are named "*EXWM*". You may want to
@@ -1066,33 +1077,22 @@ Here are a few examples:
         ([?\s-&] . (lambda (command)
 		     (interactive (list (read-shell-command "$ ")))
 		     (start-process-shell-command command nil command)))
-        ;; Bind "s-<f2>" to "slock", a simple X display locker.
-        ;; ([?\s-l] . (lambda ()
-		;;     (interactive) (start-process "" nil "/usr/bin/slock")))
+
+        ([s-f2] . desktop-environment-volume-decrement)
+        ([s-f3] . desktop-environment-volume-increment)
 
         ;; Volume control
-        ([s-f2] . (lambda ()
-                    (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master 3%- unmute")))
-        ([s-f3] . (lambda ()
-                    (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master 3%+ unmute")))
-        ([s-f4] . (lambda ()
-                    (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master toggle")))
-        ([s-f5] . (lambda ()
-                    (interactive) (start-process-shell-command "amixer" nil "amixer -c 0 set 'Auto-Mute Mode' Disabled")))
-        ([s-f6] . (lambda ()
-                      (interactive) (start-process-shell-command "amixer" nil "amixer -c 0 set 'Auto-Mute Mode' Enabled")))))
-#+end_src
-
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(setq exwm-input-prefix-keys
-      '(?\C-x
-        ?\C-u
-        ?\C-h
-        ?\M-x
-        ?\M-`
-        ?\M-&
-        ?\M-:
-        ?\M-\ ))
+        ;; ([s-f2] . (lambda ()
+        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master 3%-")))
+        ;; ([s-f3] . (lambda ()
+        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master 3%+")))
+        ;; ([s-f4] . (lambda ()
+        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master toggle")))
+        ;; ([s-f5] . (lambda ()
+        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -c 0 set 'Auto-Mute Mode' Disabled")))
+        ;; ([s-f6] . (lambda ()
+        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -c 0 set 'Auto-Mute Mode' Enabled")))
+        ))
 #+end_src
 
 ** key binding only available in line-mode
@@ -1141,7 +1141,8 @@ and DEST should be key sequences (vector or string).
 Hide the minibuffer and echo area.
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(setq exwm-workspace-minibuffer-position 'top)
+;; (setq exwm-workspace-minibuffer-position 'top)
+;; (setq exwm-workspace-minibuffer-position 'bottom)
 #+end_src
 
 ** tray
