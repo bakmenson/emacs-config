@@ -20,6 +20,7 @@
 - [[#company][Company]]
 - [[#coding][Coding]]
 - [[#emacs][Emacs]]
+- [[#telega][Telega]]
 - [[#exwm][EXWM]]
 
 * Early Init
@@ -476,7 +477,7 @@
         '(("mkv" . "mpv")
           ("mp4" . "mpv")
           ("avi" . "mpv")
-          ("html" . "firefox")
+          ;; ("html" . "firefox")
           )))
 #+end_src
 
@@ -699,16 +700,16 @@
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'perspective)
 
-(setq-default persp-initial-frame-name "main"
+(setq-default persp-initial-frame-name "Main"
               persp-modestring-short t
               ;;(persp-format-name NAME)
               ;; persp-modestring-dividers '("| " " |" " | ") ; Its value is ("[" "]" "|")
-              persp-modestring-dividers '("" "" " | ")
+              persp-modestring-dividers '("  " "  " " | ")
               persp-state-default-file "~/.persp")
 
 ;; Running `persp-mode' multiple times resets the perspective list...
-;; (unless (equal persp-mode t)
-;;   (persp-mode))
+(unless (equal persp-mode t)
+  (persp-mode))
 #+end_src
 
 ** map
@@ -972,8 +973,37 @@ folder, otherwise delete a word"
   (kbd "<leader>wq") 'save-buffers-kill-emacs)
 #+end_src
 
+* Telega
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(straight-use-package 'telega)
+(setq telega-symbol-unread "🄌")
+;; (setq telega-root-fill-column 236)
+;; (add-hook 'telega-load-hook (lambda ()
+;;  (telega-root-auto-fill-column -1)))
+
+(add-hook 'telega-root-mode-hook (lambda ()
+                                   (setq telega-root-fill-column 120)
+                                   (setq visual-fill-column-width 120
+                                         visual-fill-column-center-text t)
+                                   (visual-fill-column-mode 1)))
+
+(add-hook 'telega-chat-mode-hook (lambda ()
+                                   (setq visual-fill-column-width 70
+                                         visual-fill-column-center-text t)
+                                   (visual-fill-column-mode 1)))
+
+(telega-notifications-mode 1)
+;; (telega)
+#+end_src
+
 * EXWM
 ** funcs
+
+=TODO= setq workspace number,
+     set workspaces
+     and perspective
+     by loop in bk/exwm-init-hook
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (defun bk/call-process (command)
@@ -984,24 +1014,67 @@ folder, otherwise delete a word"
   (let ((command-parts (split-string command "[ ]+")))
     (apply #'start-process-shell-command (car command-parts) nil command-parts)))
 
-(defun bk/exwm-init-hook ()
-  ;; move to workspace 1 at startup
-  (exwm-workspace-switch-create 1)
+;; (setq workspaces '("Dev" "Idea" "Net" "Dotfiles" "Media"))
 
-  ;; launch apps at startup
-  (bk/call-process "xfce4-power-manager")
+;; (defun bk/workspaces-init-hook (workspaces)
+;;   (dolist (workspace 'workspaces)
+;;     (print workspace)))
+
+(defun bk/exwm-init-hook ()
+  (with-eval-after-load 'perspective
+    (exwm-workspace-switch-create 1)
+    (persp-switch "Dev")
+    (persp-kill "Main")
+    (bk/switch-to-dashboard)
+
+    (exwm-workspace-switch-create 2)
+    (persp-switch "Idea")
+    (persp-kill "Main")
+
+    (exwm-workspace-switch-create 3)
+    (persp-switch "Net")
+    (persp-kill "Main")
+    (telega)
+
+    (exwm-workspace-switch-create 4)
+    (persp-switch "Dotfiles")
+    (persp-kill "Main")
+    (bk/switch-to-dashboard)
+
+    (exwm-workspace-switch-create 5)
+    (persp-switch "Media")
+    (persp-kill "Main")
+    (bk/switch-to-dashboard)
+
+    (exwm-workspace-switch-create 2))
 
   (bk/shell-command "feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*")
   (bk/shell-command "picom --config ~/.config/picom.conf")
-  (bk/shell-command "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll"))
+  (bk/shell-command "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll")
+
+  ;; (bk/call-process "transmission-gtk -m")
+
+  (bk/call-process "xfce4-power-manager")
+  (bk/call-process "firefox")
+  ;; (bk/shell-command "./idea/bin/idea.sh")
+  ;; (sleep-for 60)
+  )
+
+(defun bk/switch-to-dashboard ()
+    (interactive)
+    (switch-to-buffer dashboard-buffer-name)
+    (dashboard-insert-startupify-lists)
+    (dashboard-refresh-buffer))
 #+end_src
 
 ** display time
 
-- =Turn on `display-time-mode' if you don't use an external bar.=
+- =Display time in mode line=
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (setq display-time-default-load-average nil)
+(setq display-time-24hr-format t)
+
 (display-time-mode t)
 #+end_src
 
@@ -1016,6 +1089,8 @@ folder, otherwise delete a word"
 
 ** desktop-environment
 
+- =Control the brightness, volume, take screenshots and lock screen=
+
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (straight-use-package 'desktop-environment)
 
@@ -1023,6 +1098,9 @@ folder, otherwise delete a word"
 
 (setq desktop-environment-volume-normal-decrement "2%-"
       desktop-environment-volume-normal-increment "2%+")
+
+(exwm-input-set-key (kbd "<s-f2>") 'desktop-environment-volume-decrement)
+(exwm-input-set-key (kbd "<s-f3>") 'desktop-environment-volume-increment)
 #+end_src
 
 ** updates workspaces
@@ -1061,10 +1139,13 @@ Here are a few examples:
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (setq exwm-input-global-keys
       `(
-        ;; Bind "s-r" to exit char-mode and fullscreen mode.
-        ([?\s-r] . exwm-reset)
         ;; Bind "s-w" to switch workspace interactively.
         ([?\s-w] . exwm-workspace-switch)
+        ([?\s-q] . (lambda () (interactive) (kill-this-buffer)))
+        ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
+        ([?\s-d] . (lambda () (interactive) (dired-jump)))
+        ([?\s-e] . (lambda () (interactive) (evil-switch-to-windows-last-buffer)))
+
         ;; Bind "s-0" to "s-9" to switch to a workspace by its index.
         ,@(mapcar (lambda (i)
                     `(,(kbd (format "s-%d" i)) .
@@ -1072,27 +1153,19 @@ Here are a few examples:
                         (interactive)
                         (exwm-workspace-switch-create ,i))))
                   (number-sequence 0 9))
+
         ;; Bind "s-&" to launch applications ('M-&' also works if the output
         ;; buffer does not bother you).
         ([?\s-&] . (lambda (command)
 		     (interactive (list (read-shell-command "$ ")))
-		     (start-process-shell-command command nil command)))
+		     (start-process-shell-command command nil command)))))
+#+end_src
 
-        ([s-f2] . desktop-environment-volume-decrement)
-        ([s-f3] . desktop-environment-volume-increment)
+** input set key
 
-        ;; Volume control
-        ;; ([s-f2] . (lambda ()
-        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master 3%-")))
-        ;; ([s-f3] . (lambda ()
-        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master 3%+")))
-        ;; ([s-f4] . (lambda ()
-        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -q set Master toggle")))
-        ;; ([s-f5] . (lambda ()
-        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -c 0 set 'Auto-Mute Mode' Disabled")))
-        ;; ([s-f6] . (lambda ()
-        ;;             (interactive) (start-process-shell-command "amixer" nil "amixer -c 0 set 'Auto-Mute Mode' Enabled")))
-        ))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(exwm-input-set-key (kbd "<s-return>") 'vterm)
+(exwm-input-set-key (kbd "s-b") 'persp-switch-to-buffer*)
 #+end_src
 
 ** key binding only available in line-mode
@@ -1154,26 +1227,20 @@ Hide the minibuffer and echo area.
 
 ** resolution
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
 (require 'exwm-randr)
 
-(start-process-shell-command "xrandr" nil "xrandr --output VGA-0 --primary --mode 1920x1080 --pos 0x0 --rotate normal")
+(bk/shell-command "xrandr --output VGA-0 --primary --mode 1920x1080 --pos 0x0 --rotate normal")
 
-(exwm-randr-anable)
+(exwm-randr-enable)
 #+end_src
 
 ** workspaces
 
-- =Set the initial number of workspaces (they can also be created later).=
+- =Set the initial number of workspaces=
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(setq exwm-workspace-number 5)
-#+end_src
-
-** startup
-
-#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
-(add-hook 'exwm-init-hook #'bk/exwm-init-hook)
+(setq exwm-workspace-number 6)
 #+end_src
 
 ** enable exwm
@@ -1182,7 +1249,20 @@ Do not forget to enable EXWM. It will start by itself when things are
 ready.  You can put it _anywhere_ in your configuration.
 
 #+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(add-hook 'exwm-init-hook #'bk/exwm-init-hook)
+
 (exwm-enable)
 #+end_src
 
+** startup
 
+- =TODO= add sleep for app launch
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/init.el
+(add-hook 'exwm-manage-finish-hook (lambda ()
+                                    (interactive)
+                                    (pcase exwm-class-name
+                                      ;; ("jetbrains-idea-ce" (exwm-workspace-move-window 2))
+                                      ("*Telega Root*" (exwm-workspace-move-window 3))
+                                      ("firefox" (exwm-workspace-move-window 3)))))
+#+end_src
