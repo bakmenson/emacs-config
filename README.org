@@ -991,7 +991,7 @@ folder, otherwise delete a word"
     (dashboard-refresh-buffer))
 
 (defun bk/workspace-init ()
-  (let ((workspaces '("Dev" "Idea" "Net" "Dotfiles" "Media"))
+  (let ((workspaces '("Dev" "IDEA" "Net" "Dotfiles" "Media"))
         (index 1))
     (dolist (workspace workspaces)
       (exwm-workspace-switch-create index)
