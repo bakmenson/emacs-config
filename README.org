@@ -134,12 +134,20 @@
 #+end_src
 
 ** cursor
+*** shape/color
 
 #+begin_src emacs-lisp
 (setq-default evil-normal-state-cursor '(box "medium sea green")
               evil-insert-state-cursor '(bar "medium sea green")
               evil-visual-state-cursor '(hollow "orange")
               blink-cursor-mode nil)
+#+end_src
+
+*** focus follows mouse
+
+#+begin_src emacs-lisp
+(setq mouse-autoselect-window t
+      focus-follows-mouse t)
 #+end_src
 
 ** column number
