@@ -1167,7 +1167,6 @@ Here are a few examples:
 #+begin_src emacs-lisp
 (exwm-input-set-key (kbd "<s-return>") 'vterm)
 (exwm-input-set-key (kbd "s-b") 'persp-switch-to-buffer*)
-;; (exwm-input-set-key (kbd "s-b") 'persp-ivy-switch-buffer)
 #+end_src
 
 ** key binding only available in line-mode
