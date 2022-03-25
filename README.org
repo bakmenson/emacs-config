@@ -143,11 +143,10 @@
               blink-cursor-mode nil)
 #+end_src
 
-*** focus follows mouse
+*** autoselect window
 
 #+begin_src emacs-lisp
-(setq mouse-autoselect-window t
-      focus-follows-mouse t)
+(setq mouse-autoselect-window t)
 #+end_src
 
 ** column number
