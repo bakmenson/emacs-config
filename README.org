@@ -382,6 +382,7 @@
   (kbd "<leader>bw") 'kill-buffer-and-window
 
   (kbd "<leader>bj") 'consult-bookmark
+  ;; (kbd "<leader>bj") 'counsel-bookmark
   (kbd "<leader>bs") 'bookmark-set
 
   (kbd "<leader>bl") 'evil-switch-to-windows-last-buffer
@@ -498,7 +499,10 @@
 
   (kbd "<localleader>fs") 'save-buffer
   (kbd "<localleader>ff") 'find-file
+  ;; (kbd "<localleader>ff") 'counsel-find-file
 
+  ;; (kbd "<localleader>.") 'persp-ivy-switch-buffer
+  ;; (kbd "<localleader>,") 'ivy-switch-buffer
   (kbd "<localleader>.") 'persp-switch-to-buffer*
   (kbd "<localleader>,") 'consult-buffer
 
@@ -511,6 +515,7 @@
   (kbd "<localleader>bl") 'evil-switch-to-windows-last-buffer
 
   (kbd "<localleader>bj") 'consult-bookmark
+  ;; (kbd "<localleader>bj") 'counsel-bookmark
   (kbd "<localleader>bs") 'bookmark-set
 
   (kbd "<localleader><tab>n") 'persp-next
@@ -671,6 +676,7 @@
 #+begin_src emacs-lisp
 (evil-define-key 'normal 'global
   (kbd "<leader>ff") 'find-file
+  ;; (kbd "<leader>ff") 'counsel-find-file
   (kbd "<leader>fr") 'recentf-open-files)
 #+end_src
 
@@ -699,6 +705,7 @@
 #+begin_src emacs-lisp
 (evil-define-key 'normal 'global
   (kbd "<leader>.") 'persp-switch-to-buffer*
+  ;; (kbd "<leader>.") 'persp-ivy-switch-buffer
 
   (kbd "<leader><tab>n") 'persp-next
   (kbd "<leader><tab>p") 'persp-prev
@@ -729,6 +736,20 @@
   (define-key vertico-map (kbd "C-j") 'vertico-next)
   (define-key vertico-map (kbd "C-k") 'vertico-previous)
   (define-key vertico-map [backspace] 'vertico-directory-delete-char))
+#+end_src
+
+** vertico-postframe
+
+#+begin_src emacs-lisp
+(straight-use-package 'vertico-posframe)
+
+(setq vertico-posframe-parameters
+     '((left-fringe . 8)
+       (right-fringe . 8)))
+
+(setq vertico-posframe-min-width 100)
+
+(vertico-posframe-mode 1)
 #+end_src
 
 ** marginalia
@@ -966,17 +987,20 @@ folder, otherwise delete a word"
 
 (setq telega-symbol-unread "🄌")
 
-(add-hook 'telega-root-mode-hook (lambda ()
-                                   (setq telega-root-fill-column 120)
-                                   (setq visual-fill-column-width 120
-                                         visual-fill-column-center-text t)
-                                   (visual-fill-column-mode 1)))
+(dolist (mode '(telega-root-mode-hook
+                telega-webpage-mode-hook))
+  (add-hook mode (lambda ()
+                   (setq telega-root-fill-column 120)
+                   (setq visual-fill-column-width 120
+                         visual-fill-column-center-text t)
+                   (visual-fill-column-mode 1))))
 
 (add-hook 'telega-chat-mode-hook (lambda ()
-                                   (setq visual-fill-column-width 70
+                                   (setq visual-fill-column-width 75
                                          visual-fill-column-center-text t)
                                    (visual-fill-column-mode 1)))
 
+(telega-mode-line-mode 1)
 (telega-notifications-mode 1)
 #+end_src
 
@@ -1009,7 +1033,8 @@ folder, otherwise delete a word"
   (let ((commands '("feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*"
                     "picom --config ~/.config/picom.conf"
                     "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll"
-                    "./idea/bin/idea.sh")))
+                    ;; "./idea/bin/idea.sh"
+                    )))
     (dolist (command commands)
       (let ((command-parts (split-string command "[ ]+")))
         (apply #'start-process-shell-command (car command-parts) nil command-parts)))
@@ -1028,8 +1053,7 @@ folder, otherwise delete a word"
 
 #+begin_src emacs-lisp
 (setq display-time-default-load-average nil)
-(setq display-time-24hr-format t)
-
+(setq display-time-format "  %H:%M")
 (display-time-mode t)
 #+end_src
 
@@ -1056,6 +1080,15 @@ folder, otherwise delete a word"
 
 (exwm-input-set-key (kbd "<s-f2>") 'desktop-environment-volume-decrement)
 (exwm-input-set-key (kbd "<s-f3>") 'desktop-environment-volume-increment)
+
+(defun bk/volume-get ()
+  (interactive)
+  ;; (start-process-shell-command "" nil "")
+  (start-process-shell-command "amixer" nil "amixer get Master | grep Mono: | awk '{print $3}'"))
+
+(defun bk/show-current-volume ()
+  (interactive)
+  (message "Volume %s" (bk/volume-get)))
 #+end_src
 
 ** updates workspaces
@@ -1121,6 +1154,7 @@ Here are a few examples:
 #+begin_src emacs-lisp
 (exwm-input-set-key (kbd "<s-return>") 'vterm)
 (exwm-input-set-key (kbd "s-b") 'persp-switch-to-buffer*)
+;; (exwm-input-set-key (kbd "s-b") 'persp-ivy-switch-buffer)
 #+end_src
 
 ** key binding only available in line-mode
