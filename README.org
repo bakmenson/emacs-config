@@ -211,7 +211,7 @@
     ;; evil-want-C-u-scroll t
     ;; evil-want-C-i-jump nil
     evil-respect-visual-line-mode t
-    evil-undo-system 'undo-tree)
+    evil-undo-system 'undo-fu)
 #+end_src
 
   - =Load Evil and enable it globally=
@@ -230,12 +230,13 @@
 (evil-set-leader 'normal (kbd "M-SPC") t)
 #+end_src
 
-** undo-tree
+** undo-fu
 
 #+begin_src emacs-lisp
-(straight-use-package 'undo-tree)
+(straight-use-package 'undo-fu)
 
-(global-undo-tree-mode)
+(define-key evil-normal-state-map "u" 'undo-fu-only-undo)
+(define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo)
 #+end_src
 
 ** evil-collection
