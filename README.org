@@ -1251,6 +1251,21 @@ Hide the minibuffer and echo area.
 (exwm-input-set-key (kbd "M-p") 'bk/prev-workspace)
 #+end_src
 
+*** back and forth switch
+
+#+begin_src emacs-lisp
+(defvar prev-workspace-index 0)
+(defvar curr-workspace-index 0)
+
+(add-hook 'exwm-workspace-switch-hook (lambda ()
+                                        (setq prev-workspace-index curr-workspace-index)
+                                        (setq curr-workspace-index exwm-workspace-current-index)))
+
+(exwm-input-set-key (kbd "M-<tab>") (lambda ()
+                                      (interactive)
+                                      (exwm-workspace-switch prev-workspace-index)))
+#+end_src
+
 ** enable exwm
 
 Do not forget to enable EXWM. It will start by itself when things are
