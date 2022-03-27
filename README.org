@@ -1230,7 +1230,7 @@ Hide the minibuffer and echo area.
 (setq exwm-workspace-number 6)
 #+end_src
 
-*** moving next/prev workspace
+*** switch next/prev workspace
 
 #+begin_src emacs-lisp
 (defun bk/next-workspace ()
