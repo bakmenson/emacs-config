@@ -389,8 +389,8 @@
   (kbd "<leader>dd") 'dired
   (kbd "<leader>dj") 'dired-jump
 
-  (kbd "<leader>wv") (lambda () (interactive)(evil-window-vsplit) (other-window 1))
-  (kbd "<leader>ws") (lambda () (interactive)(evil-window-split) (other-window 1))
+  (kbd "<leader>wv") (lambda () (interactive) (evil-window-vsplit) (other-window 1))
+  (kbd "<leader>ws") (lambda () (interactive) (evil-window-split) (other-window 1))
   (kbd "<leader>wh") 'evil-window-left
   (kbd "<leader>wl") 'evil-window-right
   (kbd "<leader>wj") 'evil-window-down
@@ -525,8 +525,8 @@
   (kbd "<localleader><tab>s") 'persp-state-save ; save persp
   (kbd "<localleader><tab>L") 'persp-state-load ; load persp
 
-  (kbd "<localleader>wv") (lambda () (interactive)(evil-window-vsplit) (other-window 1))
-  (kbd "<localleader>ws") (lambda () (interactive)(evil-window-split) (other-window 1))
+  (kbd "<localleader>wv") (lambda () (interactive) (evil-window-vsplit) (other-window 1))
+  (kbd "<localleader>ws") (lambda () (interactive) (evil-window-split) (other-window 1))
   (kbd "<localleader>wh") 'evil-window-left
   (kbd "<localleader>wl") 'evil-window-right
   (kbd "<localleader>wj") 'evil-window-down
@@ -729,20 +729,6 @@
   (define-key vertico-map (kbd "C-j") 'vertico-next)
   (define-key vertico-map (kbd "C-k") 'vertico-previous)
   (define-key vertico-map [backspace] 'vertico-directory-delete-char))
-#+end_src
-
-** vertico-postframe
-
-#+begin_src emacs-lisp
-(straight-use-package 'vertico-posframe)
-
-(setq vertico-posframe-parameters
-     '((left-fringe . 8)
-       (right-fringe . 8)))
-
-(setq vertico-posframe-min-width 100)
-
-(vertico-posframe-mode 1)
 #+end_src
 
 ** counsel
