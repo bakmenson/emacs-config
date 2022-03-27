@@ -1224,11 +1224,31 @@ Hide the minibuffer and echo area.
 #+end_src
 
 ** workspaces
-
-- =Set the initial number of workspaces=
+*** initial number of workspaces
 
 #+begin_src emacs-lisp
 (setq exwm-workspace-number 6)
+#+end_src
+
+*** moving next/prev workspace
+
+#+begin_src emacs-lisp
+(defun bk/next-workspace ()
+  (interactive)
+  (let ((next-index (+ exwm-workspace-current-index 1)))
+    (if (= next-index exwm-workspace-number)
+            (exwm-workspace-switch 0)
+          (exwm-workspace-switch next-index))))
+
+(defun bk/prev-workspace ()
+  (interactive)
+  (let ((next-index (- exwm-workspace-current-index 1)))
+    (if (< next-index 0)
+            (exwm-workspace-switch (- exwm-workspace-number 1))
+          (exwm-workspace-switch next-index))))
+
+(exwm-input-set-key (kbd "M-n") 'bk/next-workspace)
+(exwm-input-set-key (kbd "M-p") 'bk/prev-workspace)
 #+end_src
 
 ** enable exwm
