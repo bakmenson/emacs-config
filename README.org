@@ -26,16 +26,16 @@
 * Early Init
 ** garbage collection at startup
 
-- =Increase the GC threshold for faster startup=
-  =The default is 800 kilobytes.  Measured in bytes.=
-
-#+begin_src emacs-lisp
-(setq gc-cons-threshold (* 50 1000 1000))
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6)
 #+end_src
 
 ** native compilation settings
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(setq comp-deferred-compilation nil)
+
 (when (featurep 'native-compile)
   ;; Silence compiler warnings as they can be pretty disruptive
   (setq native-comp-async-report-warnings-errors nil)
@@ -49,13 +49,22 @@
 
 ** disable package-enable-at-startup
 
-#+begin_src emacs-lisp
+=In Emacs 27+, package initialization occurs before `user-init-file' is=
+=loaded, but after `early-init-file'. Doom handles package initialization, so=
+=we must prevent Emacs from doing it early!=
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (setq package-enable-at-startup nil)
+#+end_src
+
+=Do not allow loading from the package cache (same reason).=
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(setq package-quickstart nil)
 #+end_src
 
 ** remove some unneeded UI elements
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (setq inhibit-startup-message t)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
@@ -67,23 +76,67 @@
 
 ** make the initial buffer load faster
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (setq initial-major-mode 'fundamental-mode)
+#+end_src
+
+** frame inhibit
+
+=Resizing the Emacs frame can be a terribly expensive part of changing the=
+=font. By inhibiting this, we easily halve startup times with fonts that are=
+=larger than the system default.=
+
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
+(setq frame-inhibit-implied-resize t)
 #+end_src
 
 ** disable backup files
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (setq make-backup-files nil)
 #+end_src
 
 ** disable Unnecessary Interface
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle ~/.config/emacs/early-init.el
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (scroll-bar-mode -1)
+
+(setq inhibit-splash-screen t)
+(setq use-file-dialog nil)
+#+end_src
+
+** startup optimization
+
+- =Taken from DOOM's init=
+
+=`file-name-handler-alist' is consulted on every `require', `load' and various=
+=path/io functions. You get a minor speed up by nooping this. However, this=
+=may cause problems on builds of Emacs where its site lisp files aren't=
+=byte-compiled and we're forced to load the *.el.gz files (e.g. on Alpine)=
+
+#+begin_src emacs-lisp
+(unless (daemonp)
+  (defvar doom--initial-file-name-handler-alist file-name-handler-alist)
+  (setq file-name-handler-alist nil)
+  ;; Restore `file-name-handler-alist' later, because it is needed for handling
+  ;; encrypted or compressed files, among other things.
+  (defun doom-reset-file-handler-alist-h ()
+    ;; Re-add rather than `setq', because changes to `file-name-handler-alist'
+    ;; since startup ought to be preserved.
+    (dolist (handler file-name-handler-alist)
+      (add-to-list 'doom--initial-file-name-handler-alist handler))
+    (setq file-name-handler-alist doom--initial-file-name-handler-alist))
+  (add-hook 'emacs-startup-hook #'doom-reset-file-handler-alist-h)
+  (add-hook 'after-init-hook '(lambda ()
+                                 ;; restore after startup
+                                 (setq gc-cons-threshold 16777216
+                                       gc-cons-percentage 0.1)))
+  )
+;; Ensure Doom is running out of this file's directory
+(setq user-emacs-directory (file-truename (file-name-directory load-file-name)))
 #+end_src
 
 * Package Management
