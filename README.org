@@ -1184,7 +1184,6 @@ Here are a few examples:
         ([?\s-w] . exwm-workspace-switch)
         ([?\s-q] . (lambda () (interactive) (kill-this-buffer)))
         ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
-        ([?\s-d] . (lambda () (interactive) (dired-jump)))
         ([?\s-e] . (lambda () (interactive) (evil-switch-to-windows-last-buffer)))
 
         ;; Bind "s-0" to "s-9" to switch to a workspace by its index.
