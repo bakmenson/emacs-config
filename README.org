@@ -1306,8 +1306,8 @@ Hide the minibuffer and echo area.
 *** back and forth switch
 
 #+begin_src emacs-lisp
-(defvar prev-workspace-index 0)
-(defvar curr-workspace-index 0)
+(defvar prev-workspace-index nil)
+(defvar curr-workspace-index nil)
 
 (add-hook 'exwm-workspace-switch-hook (lambda ()
                                         (setq prev-workspace-index curr-workspace-index)
