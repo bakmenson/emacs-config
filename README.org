@@ -366,6 +366,12 @@
 (setq doom-modeline-buffer-encoding nil)
 (setq doom-modeline-persp-icon t)
 (setq doom-modeline-lsp t)
+
+(setq all-the-icons-scale-factor 1.1)
+
+(doom-modeline-def-modeline 'main
+ '(bar matches buffer-info remote-host buffer-position parrot selection-info)
+ '(misc-info minor-modes checker input-method buffer-encoding major-mode process vcs "  "))
 #+end_src
 
 ** dashboard
