@@ -1,6 +1,6 @@
 #+title: Emacs Config
 
-#+property: header-args :mkdirp yes
+#+property: header-args :mkdir yes
 #+property: header-args :emacs-lisp :tangle-mode (identity #o555) :tangle ~/.config/emacs/init.el
 
 * Table Of Content :toc_1:
