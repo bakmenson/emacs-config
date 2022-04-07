@@ -164,17 +164,17 @@
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil
                     :font "JetBrains Mono"
-                    :height 100
+                    :height 96
                     :weight 'ultra-light)
 
 (set-face-attribute 'fixed-pitch nil
                     :font "JetBrains Mono"
-                    :height 100
+                    :height 96
                     :weight 'ultra-light)
 
 (set-face-attribute 'variable-pitch nil
                     :font "JetBrains Mono"
-                    :height 100
+                    :height 96
                     :weight 'ultra-light)
 #+end_src
 
