@@ -130,7 +130,7 @@
       (add-to-list 'doom--initial-file-name-handler-alist handler))
     (setq file-name-handler-alist doom--initial-file-name-handler-alist))
   (add-hook 'emacs-startup-hook #'doom-reset-file-handler-alist-h)
-  (add-hook 'after-init-hook '(lambda ()
+  (add-hook 'after-init-hook (lambda ()
                                  ;; restore after startup
                                  (setq gc-cons-threshold 16777216
                                        gc-cons-percentage 0.1)))
@@ -1082,22 +1082,23 @@ folder, otherwise delete a word"
       (setq index (+ index 1)))
     (exwm-workspace-switch-create 2)))
 
-(defun bk/run-shell-commands ()
-  (let ((commands '("feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*"
-                    "picom --config ~/.config/picom.conf"
-                    "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll"
-                    "./idea/bin/idea.sh"
-                    )))
-    (dolist (command commands)
-      (let ((command-parts (split-string command "[ ]+")))
-        (apply #'start-process-shell-command (car command-parts) nil command-parts)))
-    ))
+;; (defun bk/run-shell-commands ()
+;;   (let ((commands '("feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*"
+;;                     ;; "picom --config ~/.config/picom.conf"
+;;                     "compton --config ~/.config/picom.conf"
+;;                     "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll"
+;;                     "./idea/bin/idea.sh"
+;;                     )))
+;;     (dolist (command commands)
+;;       (let ((command-parts (split-string command "[ ]+")))
+;;         (apply #'start-process-shell-command (car command-parts) nil command-parts)))
+;;     ))
 
-(defun bk/run-apps ()
-  (let ((apps '("xfce4-power-manager" "firefox")))
-    (dolist (app-name apps)
-      (let ((app-name-parts (split-string app-name "[ ]+")))
-        (apply #'call-process `(,(car app-name-parts) nil 0 nil ,@(cdr app-name-parts)))))))
+;; (defun bk/run-apps ()
+;;   (let ((apps '("xfce4-power-manager" "firefox")))
+;;     (dolist (app-name apps)
+;;       (let ((app-name-parts (split-string app-name "[ ]+")))
+;;         (apply #'call-process `(,(car app-name-parts) nil 0 nil ,@(cdr app-name-parts)))))))
 #+end_src
 
 ** display time
@@ -1134,14 +1135,14 @@ folder, otherwise delete a word"
 (exwm-input-set-key (kbd "<s-f2>") 'desktop-environment-volume-decrement)
 (exwm-input-set-key (kbd "<s-f3>") 'desktop-environment-volume-increment)
 
-(defun bk/volume-get ()
-  (interactive)
-  ;; (start-process-shell-command "" nil "")
-  (start-process-shell-command "amixer" nil "amixer get Master | grep Mono: | awk '{print $3}'"))
+;; (defun bk/volume-get ()
+;;   (interactive)
+;;   ;; (start-process-shell-command "" nil "")
+;;   (start-process-shell-command "amixer" nil "amixer get Master | grep Mono: | awk '{print $3}'"))
 
-(defun bk/show-current-volume ()
-  (interactive)
-  (message "Volume %s" (bk/volume-get)))
+;; (defun bk/show-current-volume ()
+;;   (interactive)
+;;   (message "Volume %s" (bk/volume-get)))
 #+end_src
 
 ** updates workspaces
@@ -1326,8 +1327,14 @@ ready.  You can put it _anywhere_ in your configuration.
 #+begin_src emacs-lisp
 (add-hook 'exwm-init-hook (lambda ()
                            (bk/workspace-init)
-                           (bk/run-shell-commands)
-                           (bk/run-apps)))
+                           (start-process-shell-command "feh" nil "feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*")
+                           (start-process-shell-command "compton" nil "compton --config ~/.config/picom.conf")
+                           (start-process-shell-command "setxkbmap" nil "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll")
+                           (call-process "xfce4-power-manager" nil 0 nil)
+                           (call-process "firefox" nil 0 nil)
+                           ;;(bk/run-shell-commands)
+                           ;;(bk/run-apps)
+                           ))
 
 (exwm-enable)
 #+end_src
