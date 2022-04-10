@@ -373,6 +373,14 @@
 (dashboard-setup-startup-hook)
 #+end_src
 
+#+begin_src emacs-lisp
+(defun bk/switch-to-dashboard ()
+    (interactive)
+    (switch-to-buffer dashboard-buffer-name)
+    (dashboard-insert-startupify-lists)
+    (dashboard-refresh-buffer))
+#+end_src
+
 ** transparecy
 
 #+begin_src emacs-lisp
@@ -1047,15 +1055,6 @@ folder, otherwise delete a word"
 
 * EXWM
 ** funcs
-
-#+begin_src emacs-lisp
-(defun bk/switch-to-dashboard ()
-    (interactive)
-    (switch-to-buffer dashboard-buffer-name)
-    (dashboard-insert-startupify-lists)
-    (dashboard-refresh-buffer))
-#+end_src
-
 ** display time
 
 - =Display time in mode line=
