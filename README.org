@@ -352,26 +352,8 @@
 ** modeline
 
 #+begin_src emacs-lisp
-(straight-use-package 'doom-modeline)
-
-(require 'doom-modeline)
-(doom-modeline-mode 1)
-
-(setq doom-modeline-height 20)
-(setq doom-modeline-icon (display-graphic-p))
-(setq doom-modeline-major-mode-icon t)
-(setq doom-modeline-major-mode-color-icon t)
-(setq doom-modeline-buffer-state-icon t)
-(setq doom-modeline-buffer-modification-icon t)
-(setq doom-modeline-buffer-encoding nil)
-(setq doom-modeline-persp-icon t)
-(setq doom-modeline-lsp t)
-
-(setq all-the-icons-scale-factor 1.1)
-
-(doom-modeline-def-modeline 'main
- '(bar matches buffer-info remote-host buffer-position parrot selection-info)
- '(misc-info minor-modes checker input-method buffer-encoding major-mode process vcs "   "))
+(straight-use-package 'mood-line)
+(mood-line-mode)
 #+end_src
 
 ** dashboard
