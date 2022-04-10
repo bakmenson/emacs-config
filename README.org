@@ -1278,7 +1278,7 @@ Hide the minibuffer and echo area.
   (interactive)
   (let ((next-index (+ exwm-workspace-current-index 1)))
     (if (= next-index exwm-workspace-number)
-            (exwm-workspace-switch 0)
+            (exwm-workspace-switch 1)
           (exwm-workspace-switch next-index))))
 
 (defun bk/prev-workspace ()
