@@ -1027,11 +1027,11 @@ folder, otherwise delete a word"
 (straight-use-package 'telega)
 
 (setq telega-symbol-unread "🄌")
+(setq telega-root-fill-column 120)
 
 (dolist (mode '(telega-root-mode-hook
                 telega-webpage-mode-hook))
   (add-hook mode (lambda ()
-                   (setq telega-root-fill-column 120)
                    (setq visual-fill-column-width 120
                          visual-fill-column-center-text t)
                    (visual-fill-column-mode 1))))
