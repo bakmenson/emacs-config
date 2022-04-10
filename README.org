@@ -345,8 +345,6 @@
       doom-themes-visual-bell-config nil)
 
 (doom-themes-org-config)
-
-(load-theme 'doom-one t)
 #+end_src
 
 ** modeline
@@ -1328,6 +1326,7 @@ Hide the minibuffer and echo area.
 #+begin_src emacs-lisp
 (add-hook 'exwm-manage-finish-hook (lambda ()
                                     (interactive)
+                                    (load-theme 'doom-one t)
                                     (pcase exwm-class-name
                                       ("jetbrains-idea-ce" (exwm-workspace-move-window 2))
                                       ("*Telega Root*" (exwm-workspace-move-window 3))
