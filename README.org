@@ -1054,7 +1054,6 @@ folder, otherwise delete a word"
 #+end_src
 
 * EXWM
-** funcs
 ** display time
 
 - =Display time in mode line=
