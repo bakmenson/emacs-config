@@ -1276,17 +1276,17 @@ Hide the minibuffer and echo area.
 #+begin_src emacs-lisp
 (defun bk/next-workspace ()
   (interactive)
-  (let ((next-index (+ exwm-workspace-current-index 1)))
-    (if (= next-index exwm-workspace-number)
+  (let ((index (+ exwm-workspace-current-index 1)))
+    (if (= index exwm-workspace-number)
             (exwm-workspace-switch 1)
-          (exwm-workspace-switch next-index))))
+          (exwm-workspace-switch index))))
 
 (defun bk/prev-workspace ()
   (interactive)
-  (let ((next-index (- exwm-workspace-current-index 1)))
-    (if (< next-index 0)
+  (let ((index (- exwm-workspace-current-index 1)))
+    (if (< index 0)
             (exwm-workspace-switch (- exwm-workspace-number 1))
-          (exwm-workspace-switch next-index))))
+          (exwm-workspace-switch index))))
 
 (exwm-input-set-key (kbd "M-n") 'bk/next-workspace)
 (exwm-input-set-key (kbd "M-p") 'bk/prev-workspace)
