@@ -1310,9 +1310,11 @@ Hide the minibuffer and echo area.
 
 #+begin_src emacs-lisp
 (add-hook 'exwm-init-hook (lambda ()
+                           (load-theme 'doom-one t)
                            (bk/workspace-init)
                            (bk/run-shell-commands)
-                           (bk/run-apps)))
+                           (bk/run-apps)
+                           ))
 #+end_src
 
 *** exwm enable
@@ -1326,7 +1328,6 @@ Hide the minibuffer and echo area.
 #+begin_src emacs-lisp
 (add-hook 'exwm-manage-finish-hook (lambda ()
                                     (interactive)
-                                    (load-theme 'doom-one t)
                                     (pcase exwm-class-name
                                       ("jetbrains-idea-ce" (exwm-workspace-move-window 2))
                                       ("*Telega Root*" (exwm-workspace-move-window 3))
