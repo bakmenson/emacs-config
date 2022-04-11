@@ -1071,29 +1071,26 @@ folder, otherwise delete a word"
 (require 'exwm-config)
 #+end_src
 
-** desktop-environment
-
-- =Control the brightness, volume, take screenshots and lock screen=
+** volume
 
 #+begin_src emacs-lisp
-(straight-use-package 'desktop-environment)
+(defun bk/set-volume (value)
+  (shell-command-to-string (format "amixer -q set Master %s unmute" value))
+  (bk/show-current-volume))
 
-(desktop-environment-mode)
+(defun bk/show-current-volume ()
+  (interactive)
+  (message "Volume %s" (bk/get-current-volume)))
 
-(setq desktop-environment-volume-normal-decrement "2%-"
-      desktop-environment-volume-normal-increment "2%+")
+(defun bk/get-current-volume ()
+  (let ((output (shell-command-to-string "amixer get Master"))
+        (regex "\\([0-9]+%\\)"))
+    (save-match-data
+      (string-match regex output)
+      (match-string 1 output))))
 
-(exwm-input-set-key (kbd "<s-f2>") 'desktop-environment-volume-decrement)
-(exwm-input-set-key (kbd "<s-f3>") 'desktop-environment-volume-increment)
-
-;; (defun bk/volume-get ()
-;;   (interactive)
-;;   ;; (start-process-shell-command "" nil "")
-;;   (start-process-shell-command "amixer" nil "amixer get Master | grep Mono: | awk '{print $3}'"))
-
-;; (defun bk/show-current-volume ()
-;;   (interactive)
-;;   (message "Volume %s" (bk/volume-get)))
+(exwm-input-set-key (kbd "<s-f2>") (lambda () (interactive) (bk/set-volume "2%-")))
+(exwm-input-set-key (kbd "<s-f3>") (lambda () (interactive) (bk/set-volume "2%+")))
 #+end_src
 
 ** updates workspaces
