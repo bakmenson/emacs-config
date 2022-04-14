@@ -15,6 +15,7 @@
 - [[#org][Org]]
 - [[#files][Files]]
 - [[#workspaces][Workspaces]]
+- [[#projectile][Projectile]]
 - [[#completion][Completion]]
 - [[#editing][Editing]]
 - [[#company][Company]]
@@ -363,7 +364,8 @@
       dashboard-startup-banner 'logo
       dashboard-center-content t
       dashboard-items '((recents  . 10)
-			(bookmarks . 10))
+                        (projects . 10)
+			            (bookmarks . 10))
       dashboard-set-heading-icons t
       dashboard-set-file-icons t
       dashboard-set-navigator t)
@@ -759,6 +761,18 @@
   (kbd "<leader><tab>R") 'persp-rename
   (kbd "<leader><tab>s") 'persp-state-save ; save persp
   (kbd "<leader><tab>L") 'persp-state-load) ; load persp
+#+end_src
+
+* Projectile
+
+#+begin_src emacs-lisp
+(straight-use-package 'projectile)
+
+(projectile-mode +1)
+
+(define-key projectile-mode-map (kbd "<localleader>p") 'projectile-command-map)
+
+(setq projectile-switch-project-action #'projectile-dired)
 #+end_src
 
 * Completion
