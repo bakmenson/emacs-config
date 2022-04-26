@@ -996,6 +996,8 @@ folder, otherwise delete a word"
 
 #+begin_src emacs-lisp
 (straight-use-package 'lsp-mode)
+
+(setq lsp-keymap-prefix "<leader>l")
 #+end_src
 
 ** rust
