@@ -1006,6 +1006,12 @@ folder, otherwise delete a word"
 
 #+end_src
 
+*** lsp-ui
+
+#+begin_src emacs-lisp
+(straight-use-package 'lsp-ui)
+#+end_src
+
 ** rust
 *** Rust Mode
 
