@@ -992,6 +992,12 @@ folder, otherwise delete a word"
   (kbd "<leader>gr") 'magit-rebase)
 #+end_src
 
+** lsp
+
+#+begin_src emacs-lisp
+(straight-use-package 'lsp-mode)
+#+end_src
+
 ** rust
 *** Rust Mode
 
