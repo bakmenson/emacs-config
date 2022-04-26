@@ -1018,6 +1018,10 @@ folder, otherwise delete a word"
 
 #+begin_src emacs-lisp
 (straight-use-package 'python-mode)
+(straight-use-package 'lsp-pyright)
+
+(require 'lsp-pyright)
+(add-hook 'python-mode-hook #'lsp-deferred)
 #+end_src
 
 ** flycheck
