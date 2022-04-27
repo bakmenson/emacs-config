@@ -737,7 +737,8 @@
               ;;(persp-format-name NAME)
               ;; persp-modestring-dividers '("| " " |" " | ") ; Its value is ("[" "]" "|")
               persp-modestring-dividers '("  " "  " " | ")
-              persp-state-default-file "~/.persp")
+              persp-state-default-file "~/.persp"
+              persp-suppress-no-prefix-key-warning t)
 
 ;; Running `persp-mode' multiple times resets the perspective list...
 (unless (equal persp-mode t)
