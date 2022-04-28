@@ -1036,13 +1036,13 @@ folder, otherwise delete a word"
 #+end_src
 
 ** rust
-*** Rust Mode
+*** rust mode
 
 #+begin_src emacs-lisp
 (straight-use-package 'rust-mode)
 #+end_src
 
-*** Cargo
+*** cargo
 
 #+begin_src emacs-lisp
 (straight-use-package 'cargo)
