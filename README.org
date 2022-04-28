@@ -1013,6 +1013,28 @@ folder, otherwise delete a word"
 (straight-use-package 'lsp-ui)
 #+end_src
 
+** tree-sitter
+*** install
+
+#+begin_src emacs-lisp
+(straight-use-package 'tree-sitter)
+(straight-use-package 'tree-sitter-langs)
+#+end_src
+
+*** load the framework and the language bundle:
+
+#+begin_src emacs-lisp
+(require 'tree-sitter)
+(require 'tree-sitter-langs)
+#+end_src
+
+*** enable
+
+#+begin_src emacs-lisp
+(global-tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+#+end_src
+
 ** rust
 *** Rust Mode
 
