@@ -1059,6 +1059,15 @@ folder, otherwise delete a word"
 (add-hook 'python-mode-hook #'lsp-deferred)
 #+end_src
 
+** java
+
+#+begin_src emacs-lisp
+(straight-use-package 'lsp-java)
+
+(require 'lsp-java)
+(add-hook 'java-mode-hook #'lsp-deferred)
+#+end_src
+
 ** flycheck
 
 #+begin_src emacs-lisp
