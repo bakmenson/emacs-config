@@ -1240,7 +1240,7 @@ Here are a few examples:
 ** input set key
 
 #+begin_src emacs-lisp
-(exwm-input-set-key (kbd "<s-return>") 'vterm)
+(exwm-input-set-key (kbd "<s-return>") 'multi-vterm)
 (exwm-input-set-key (kbd "s-b") 'persp-switch-to-buffer*)
 #+end_src
 
