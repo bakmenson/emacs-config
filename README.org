@@ -458,9 +458,18 @@
 
 #+begin_src emacs-lisp
 (straight-use-package 'vterm)
+#+end_src
+
+** multi-vterm
+
+#+begin_src emacs-lisp
+(straight-use-package 'multi-vterm)
 
 (evil-define-key 'normal 'global
-  (kbd "<leader>tt") 'vterm)
+  (kbd "<leader>to") 'multi-vterm
+  (kbd "<leader>tn") 'multi-vterm-next
+  (kbd "<leader>tp") 'multi-vterm-prev
+  (kbd "<leader>tt") 'multi-vterm-dedicated-toggle)
 #+end_src
 
 * Dired
