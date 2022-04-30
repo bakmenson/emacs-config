@@ -1141,6 +1141,14 @@ folder, otherwise delete a word"
 (require 'exwm-config)
 #+end_src
 
+** screenshot
+
+#+begin_src emacs-lisp
+(exwm-input-set-key (kbd "<s-f10>") (lambda () (interactive) (shell-command-to-string "scrot -e 'mv $f ~/Pictures'")))
+(exwm-input-set-key (kbd "<s-f11>") (lambda () (interactive) (shell-command-to-string "scrot -u -e 'mv $f ~/Pictures'")))
+(exwm-input-set-key (kbd "<s-f12>") (lambda () (interactive) (shell-command-to-string "scrot -s -e 'mv $f ~/Pictures'")))
+#+end_src
+
 ** volume
 
 #+begin_src emacs-lisp
