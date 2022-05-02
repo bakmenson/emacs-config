@@ -561,7 +561,7 @@
   (kbd "<localleader>.") 'persp-switch-to-buffer*
   (kbd "<localleader>,") 'consult-buffer
 
-  (kbd "<localleader>tt") 'vterm
+  (kbd "<localleader>tt") 'multi-vterm
 
   (kbd "<localleader>bK") 'kill-buffer
   (kbd "<localleader>bk") 'kill-this-buffer
