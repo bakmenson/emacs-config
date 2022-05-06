@@ -1111,8 +1111,6 @@ folder, otherwise delete a word"
 #+begin_src emacs-lisp
 (straight-use-package 'telega)
 
-(setq telega-symbol-unread "🄌")
-
 (dolist (mode '(telega-root-mode-hook
                 telega-webpage-mode-hook))
   (add-hook mode (lambda ()
