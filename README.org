@@ -1112,7 +1112,6 @@ folder, otherwise delete a word"
 (straight-use-package 'telega)
 
 (setq telega-symbol-unread "🄌")
-(setq telega-root-fill-column 120)
 
 (dolist (mode '(telega-root-mode-hook
                 telega-webpage-mode-hook))
