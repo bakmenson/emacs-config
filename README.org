@@ -1016,7 +1016,7 @@ folder, otherwise delete a word"
       lsp-keep-workspace-alive nil)
 #+end_src
 
-*** lsp-ui
+** lsp-ui
 
 #+begin_src emacs-lisp
 (straight-use-package 'lsp-ui)
