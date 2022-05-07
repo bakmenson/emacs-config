@@ -1368,7 +1368,8 @@ Hide the minibuffer and echo area.
           (bk/switch-to-dashboard))
       (if (equal index 3) (telega))
       (setq index (+ index 1)))
-    (exwm-workspace-switch-create 2)))
+    (exwm-workspace-switch-create 4)
+    (bk/switch-to-dashboard)))
 
 (defun bk/run-shell-commands ()
   (let ((commands '("feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*"
