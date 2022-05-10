@@ -1098,6 +1098,14 @@ folder, otherwise delete a word"
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 #+end_src
 
+** yasnippet
+
+#+begin_src emacs-lisp
+(straight-use-package 'yasnippet)
+(require 'yasnippet)
+(yas-global-mode 1)
+#+end_src
+
 * Emacs
 
 #+begin_src emacs-lisp
