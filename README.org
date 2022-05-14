@@ -1015,7 +1015,8 @@ folder, otherwise delete a word"
       lsp-enable-text-document-color nil
       lsp-enable-on-type-formatting nil
       lsp-headerline-breadcrumb-enable nil
-      lsp-keep-workspace-alive nil)
+      lsp-keep-workspace-alive nil
+      lsp-auto-guess-root t)
 #+end_src
 
 ** lsp-ui
