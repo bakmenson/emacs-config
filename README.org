@@ -1189,6 +1189,13 @@ folder, otherwise delete a word"
 #+end_src
 
 ** launch apps
+
+#+begin_src emacs-lisp
+(defun bk/tor-browser ()
+  (interactive)
+  (start-process-shell-command "tor" nil "sh -c '/home/solus/.tor-browser/Browser/start-tor-browser' --detach"))
+#+end_src
+
 ** updates workspaces
 
 All buffers created in EXWM mode are named "*EXWM*". You may want to
