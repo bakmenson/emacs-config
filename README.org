@@ -1188,6 +1188,7 @@ folder, otherwise delete a word"
 (exwm-input-set-key (kbd "<s-f3>") (lambda () (interactive) (bk/set-volume "2%+")))
 #+end_src
 
+** launch apps
 ** updates workspaces
 
 All buffers created in EXWM mode are named "*EXWM*". You may want to
