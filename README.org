@@ -1149,32 +1149,31 @@ folder, otherwise delete a word"
 (setq-default minibuffer-line-refresh-interval 30)
 (setq-default minibuffer-line-format
               '("| "
-                (:eval (format " ssd"))
+                (:eval (propertize (format " ssd")
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
-                (:eval (format " hdd"))
+                (:eval (propertize (format " hdd")
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
-                (:eval (format " meme"))
+                (:eval (propertize (format " mem")
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
-                (:eval (format " cpu"))
+                (:eval (propertize (format " cpu")
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
-                (:eval (format " temp"))
+                (:eval (propertize (format " temp")
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
-                (:eval (format " %s" (bk/get-current-volume)))
+                (:eval (propertize (format " %s" (bk/get-current-volume))
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
-                (:eval (format-time-string "%A, %d %B"))
+                (:eval (propertize (format-time-string "%A, %d %B")
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
-                (:eval (format-time-string "%H:%M"))
+                (:eval (propertize (format-time-string "%H:%M")
+                                    'face '(:foreground "gray" :background "#282c34")))
                 " | "
                 ))
-
-;; (setq-default minibuffer-line-format
-;;               '("| "
-;;                 (:eval (propertize (format-time-string "%R")
-;;                                    'font-lock-face
-;;                                    'minibuffer-line-time))
-;;                 " | "
-;;                 (:eval (format-time-string "%F"))
-;;                 " | "))
 
 (minibuffer-line-mode 1)
 #+end_src
