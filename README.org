@@ -1200,12 +1200,7 @@ folder, otherwise delete a word"
 #+begin_src emacs-lisp
 (defun bk/set-volume (value)
   (shell-command-to-string (format "amixer -q set Master %s unmute" value))
-  (bk/show-current-volume)
   (minibuffer-line--update))
-
-(defun bk/show-current-volume ()
-  (interactive)
-  (message "Volume %s" (bk/get-current-volume)))
 
 (defun bk/get-current-volume ()
   (let ((output (shell-command-to-string "amixer get Master"))
