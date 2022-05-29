@@ -1144,9 +1144,9 @@ folder, otherwise delete a word"
 - =Display time in mode line=
 
 #+begin_src emacs-lisp
-(setq display-time-default-load-average nil)
-(setq display-time-format "  %H:%M")
-(display-time-mode t)
+(straight-use-package 'minibuffer-line)
+(setq-default minibuffer-line-format
+              '((:eval (format-time-string "| %A, %d %B | %H:%M |"))))
 #+end_src
 
 ** load exwm
