@@ -1145,8 +1145,38 @@ folder, otherwise delete a word"
 
 #+begin_src emacs-lisp
 (straight-use-package 'minibuffer-line)
+
+(setq-default minibuffer-line-refresh-interval 30)
 (setq-default minibuffer-line-format
-              '((:eval (format-time-string "| %A, %d %B | %H:%M |"))))
+              '("| "
+                (:eval (format " ssd"))
+                " | "
+                (:eval (format " hdd"))
+                " | "
+                (:eval (format " meme"))
+                " | "
+                (:eval (format " cpu"))
+                " | "
+                (:eval (format " temp"))
+                " | "
+                (:eval (format " %s" (bk/get-current-volume)))
+                " | "
+                (:eval (format-time-string "%A, %d %B"))
+                " | "
+                (:eval (format-time-string "%H:%M"))
+                " | "
+                ))
+
+;; (setq-default minibuffer-line-format
+;;               '("| "
+;;                 (:eval (propertize (format-time-string "%R")
+;;                                    'font-lock-face
+;;                                    'minibuffer-line-time))
+;;                 " | "
+;;                 (:eval (format-time-string "%F"))
+;;                 " | "))
+
+(minibuffer-line-mode 1)
 #+end_src
 
 ** load exwm
