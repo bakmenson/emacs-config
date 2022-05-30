@@ -1147,33 +1147,20 @@ folder, otherwise delete a word"
 (straight-use-package 'minibuffer-line)
 
 (setq-default minibuffer-line-refresh-interval 30)
+
 (setq-default minibuffer-line-format
-              '("| "
-                (:eval (propertize (format " ssd")
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                (:eval (propertize (format " hdd")
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                (:eval (propertize (format " mem")
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                (:eval (propertize (format " cpu")
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                (:eval (propertize (format " temp")
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                (:eval (propertize (format " %s" (bk/get-current-volume))
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                (:eval (propertize (format-time-string "%A, %d %B")
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                (:eval (propertize (format-time-string "%H:%M")
-                                    'face '(:foreground "gray" :background "#282c34")))
-                " | "
-                ))
+              '((:eval (propertize (format "|  %s |  %s |  %s |  %s |  %s |  %s  |"
+                                          "ssd"
+                                          "hdd"
+                                          "mem"
+                                          "cpu"
+                                          "temp"
+                                          (bk/get-current-volume))
+                                   'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format-time-string " %A, %d %B |")
+                    'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format-time-string " %H:%M |")
+                                    'face '(:foreground "gray" :background "#282c34")))))
 
 (minibuffer-line-mode 1)
 #+end_src
