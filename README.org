@@ -1150,9 +1150,9 @@ folder, otherwise delete a word"
 
 (setq-default minibuffer-line-format
               '((:eval (propertize (format "%s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" "ssd") 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s" (bk/disk-avail-size "/dev/sda2")) 'face '(:foreground "gray" :background "#282c34")))
                 (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" "hdd") 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s" (bk/disk-avail-size "/run/media/solus/hdd")) 'face '(:foreground "gray" :background "#282c34")))
                 (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
                 (:eval (propertize (format " %s" "mem") 'face '(:foreground "gray" :background "#282c34")))
                 (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
@@ -1169,6 +1169,18 @@ folder, otherwise delete a word"
                 ))
 
 (minibuffer-line-mode 1)
+#+end_src
+
+** system info
+*** storage
+
+#+begin_src emacs-lisp
+(defun bk/disk-avail-size (disk)
+    (let ((output (shell-command-to-string (format "df -h %s --output=avail" disk)))
+          (regex "\\([0-9]+G\\)"))
+      (save-match-data
+        (string-match regex output)
+        (match-string 1 output))))
 #+end_src
 
 ** load exwm
