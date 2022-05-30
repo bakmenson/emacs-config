@@ -1194,6 +1194,21 @@ folder, otherwise delete a word"
       (match-string 1 output))))
 #+end_src
 
+*** memory
+
+#+begin_src emacs-lisp
+#+end_src
+
+*** cpu
+
+#+begin_src emacs-lisp
+#+end_src
+
+*** temperatura
+
+#+begin_src emacs-lisp
+#+end_src
+
 ** load exwm
 
 #+begin_src emacs-lisp
