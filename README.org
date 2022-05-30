@@ -1139,38 +1139,6 @@ folder, otherwise delete a word"
 #+end_src
 
 * EXWM
-** minibuffer-line
-
-- =Display system info in minibuffer line mode=
-
-#+begin_src emacs-lisp
-(straight-use-package 'minibuffer-line)
-
-(setq-default minibuffer-line-refresh-interval 30)
-
-(setq-default minibuffer-line-format
-              '((:eval (propertize (format "%s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" (bk/disk-avail-size "/dev/sda2")) 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" (bk/disk-avail-size "/run/media/solus/hdd")) 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" (bk/get-used-mem)) 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" "cpu") 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" "temp") 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s " (bk/get-current-volume)) 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format-time-string "%A, %d %B") 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format-time-string "%H:%M") 'face '(:foreground "gray" :background "#282c34")))
-                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                ))
-
-(minibuffer-line-mode 1)
-#+end_src
-
 ** system info
 *** storage
 
@@ -1210,6 +1178,38 @@ folder, otherwise delete a word"
 *** temperatura
 
 #+begin_src emacs-lisp
+#+end_src
+
+** minibuffer-line
+
+- =Display system info in minibuffer line mode=
+
+#+begin_src emacs-lisp
+(straight-use-package 'minibuffer-line)
+
+(setq-default minibuffer-line-refresh-interval 30)
+
+(setq-default minibuffer-line-format
+              '((:eval (propertize (format "%s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format " %s" (bk/disk-avail-size "/dev/sda2")) 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format " %s" (bk/disk-avail-size "/run/media/solus/hdd")) 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format " %s" (bk/get-used-mem)) 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format " %s" "cpu") 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format " %s" "temp") 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format " %s " (bk/get-current-volume)) 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format-time-string "%A, %d %B") 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                (:eval (propertize (format-time-string "%H:%M") 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
+                ))
+
+(minibuffer-line-mode 1)
 #+end_src
 
 ** load exwm
