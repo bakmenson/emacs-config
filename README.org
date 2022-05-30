@@ -1154,7 +1154,7 @@ folder, otherwise delete a word"
                 (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
                 (:eval (propertize (format " %s" (bk/disk-avail-size "/run/media/solus/hdd")) 'face '(:foreground "gray" :background "#282c34")))
                 (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
-                (:eval (propertize (format " %s" "mem") 'face '(:foreground "gray" :background "#282c34")))
+                (:eval (propertize (format " %s" (bk/get-used-mem)) 'face '(:foreground "gray" :background "#282c34")))
                 (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
                 (:eval (propertize (format " %s" "cpu") 'face '(:foreground "gray" :background "#282c34")))
                 (:eval (propertize (format " %s " "|") 'face '(:foreground "dim gray" :background "#282c34")))
@@ -1197,6 +1197,9 @@ folder, otherwise delete a word"
 *** memory
 
 #+begin_src emacs-lisp
+(defun bk/get-used-mem ()
+  (replace-regexp-in-string "r?\n$" ""
+                            (shell-command-to-string "free -h --si | grep Mem | awk '{print $3}'")))
 #+end_src
 
 *** cpu
