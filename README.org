@@ -1139,9 +1139,9 @@ folder, otherwise delete a word"
 #+end_src
 
 * EXWM
-** display time
+** minibuffer-line
 
-- =Display time in mode line=
+- =Display system info in minibuffer line mode=
 
 #+begin_src emacs-lisp
 (straight-use-package 'minibuffer-line)
