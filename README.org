@@ -1211,7 +1211,7 @@ folder, otherwise delete a word"
 (exwm-input-set-key (kbd "<s-f12>") (lambda () (interactive) (shell-command-to-string "scrot -s -e 'mv $f ~/Pictures'")))
 #+end_src
 
-** volume
+** set volume
 
 #+begin_src emacs-lisp
 (defun bk/set-volume (value)
