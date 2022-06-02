@@ -347,6 +347,7 @@ after first installation packaage all-the-icons =M-x: all-the-icons-install-font
       doom-themes-visual-bell-config nil)
 
 (doom-themes-org-config)
+(load-theme 'doom-one t)
 #+end_src
 
 ** modeline
