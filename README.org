@@ -1120,21 +1120,20 @@ folder, otherwise delete a word"
 * Telega
 
 #+begin_src emacs-lisp
-;;(straight-use-package 'telega)
+(straight-use-package 'telega)
 
-;;(dolist (mode '(telega-root-mode-hook
-;;                telega-webpage-mode-hook))
-;;  (add-hook mode (lambda ()
-;;                   (setq visual-fill-column-width 120
-;;                         visual-fill-column-center-text t)
-;;                   (visual-fill-column-mode 1))))
+(dolist (mode '(telega-root-mode-hook
+               telega-webpage-mode-hook))
+ (add-hook mode (lambda ()
+                  (setq visual-fill-column-width 120
+                        visual-fill-column-center-text t)
+                  (visual-fill-column-mode 1))))
 
-;;(add-hook 'telega-chat-mode-hook (lambda ()
-;;                                   (setq visual-fill-column-width 75
-;;                                         visual-fill-column-center-text t)
-;;                                   (visual-fill-column-mode 1)))
+(add-hook 'telega-chat-mode-hook (lambda ()
+                                  (setq visual-fill-column-width 75
+                                        visual-fill-column-center-text t)
+                                  (visual-fill-column-mode 1)))
 
-;;(telega-mode-line-mode 1)
-;;(telega-notifications-mode 1)
+(telega-mode-line-mode 1)
+(telega-notifications-mode 1)
 #+end_src
-
