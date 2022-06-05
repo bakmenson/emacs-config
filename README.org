@@ -9,6 +9,7 @@
 - [[#base-config][Base Config]]
 - [[#evil][Evil]]
 - [[#ui][UI]]
+- [[#daemon][Daemon]]
 - [[#buffers][Buffers]]
 - [[#terminal][Terminal]]
 - [[#dired][Dired]]
@@ -162,20 +163,21 @@
 ** fonts
 
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil
-                    :font "JetBrains Mono"
-                    :height 90
-                    :weight 'normal)
+(defun bk/set-font-faces ()
+  (set-face-attribute 'default nil
+                      :font "JetBrains Mono"
+                      :height 90
+                      :weight 'normal)
 
-(set-face-attribute 'fixed-pitch nil
-                    :font "JetBrains Mono"
-                    :height 90
-                    :weight 'normal)
+  (set-face-attribute 'fixed-pitch nil
+                      :font "JetBrains Mono"
+                      :height 90
+                      :weight 'normal)
 
-(set-face-attribute 'variable-pitch nil
-                    :font "JetBrains Mono"
-                    :height 90
-                    :weight 'normal)
+  (set-face-attribute 'variable-pitch nil
+                      :font "JetBrains Mono"
+                      :height 90
+                      :weight 'normal))
 #+end_src
 
 ** default coding system
@@ -248,6 +250,12 @@
 
 #+begin_src emacs-lisp
 (straight-use-package 'snow)
+#+end_src
+
+** server mode
+
+#+begin_src emacs-lisp
+(server-start)
 #+end_src
 
 * Evil
@@ -408,6 +416,22 @@ after first installation packaage all-the-icons =M-x: all-the-icons-install-font
 		           (setq visual-fill-column-width 120
 			             visual-fill-column-center-text t)
 		           (visual-fill-column-mode 1))))
+#+end_src
+
+* Daemon
+
+#+begin_src emacs-lisp
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                (with-selected-frame frame
+                  (load-theme 'doom-one t)
+                  (setq telega-use-images '(scale rotate90)
+                        telega-root-show-avatars '(scale rotate90)
+                        telega-chat-show-avatars '(scale rotate90)
+                        telega-user-show-avatars '(scale rotate90))
+                  (bk/set-font-faces))))
+  (bk/set-font-faces))
 #+end_src
 
 * Buffers
@@ -745,6 +769,7 @@ after first installation packaage all-the-icons =M-x: all-the-icons-install-font
 
 (setq-default persp-initial-frame-name "Main"
               persp-modestring-short t
+              persp-show-modestring nil
               ;;(persp-format-name NAME)
               ;; persp-modestring-dividers '("| " " |" " | ") ; Its value is ("[" "]" "|")
               persp-modestring-dividers '("  " "  " " | ")
