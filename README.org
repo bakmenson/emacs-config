@@ -1209,13 +1209,19 @@ top -bn1 | grep '%Cpu' | tail -1 | grep -P '(....|...) id,'|awk '{print "CPU Usa
 *** telega
 
 #+begin_src emacs-lisp
+;; (defun bk/telega-msg-count ()
+;;   (let ((msg_count (plist-get telega--unread-message-count :unread_count))
+;;         (msg_unmuted_count (plist-get telega--unread-message-count :unread_unmuted_count))
+;;         (chat_count (plist-get telega--unread-chat-count :unread_count))
+;;         (chat_unmuted_count (plist-get telega--unread-chat-count :unread_unmuted_count)))
+;;     (format "m: %s(%s) u: %s(%s)"
+;;             (- chat_count chat_unmuted_count) (- msg_count msg_unmuted_count)
+;;             chat_unmuted_count msg_unmuted_count)))
+
 (defun bk/telega-msg-count ()
-  (let ((msg_count (plist-get telega--unread-message-count :unread_count))
-        (msg_unmuted_count (plist-get telega--unread-message-count :unread_unmuted_count))
-        (chat_count (plist-get telega--unread-chat-count :unread_count))
+  (let ((msg_unmuted_count (plist-get telega--unread-message-count :unread_unmuted_count))
         (chat_unmuted_count (plist-get telega--unread-chat-count :unread_unmuted_count)))
-    (format "m: %s(%s) u: %s(%s)"
-            (- chat_count chat_unmuted_count) (- msg_count msg_unmuted_count)
+    (format "%s(%s)"
             chat_unmuted_count msg_unmuted_count)))
 
 (add-hook 'telega-root-update-hook 'minibuffer-line--update)
