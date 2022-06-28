@@ -1137,7 +1137,7 @@ folder, otherwise delete a word"
                                    (visual-fill-column-mode 1)))
 
 ;; (telega-mode-line-mode 1)
-;; (telega-notifications-mode 1)
+(telega-notifications-mode 1)
 #+end_src
 
 * Async
@@ -1160,6 +1160,13 @@ folder, otherwise delete a word"
 #+end_src
 
 * EXWM
+** hide-mode-line
+
+#+begin_src emacs-lisp
+(straight-use-package 'hide-mode-line)
+(require 'hide-mode-line)
+#+end_src
+
 ** system info
 *** storage
 
@@ -1234,73 +1241,189 @@ top -bn1 | grep '%Cpu' | tail -1 | grep -P '(....|...) id,'|awk '{print "CPU Usa
 #+begin_src emacs-lisp
 (straight-use-package 'minibuffer-line)
 
+;; (setq-default minibuffer-line-format '((:eval
+;;                                         (let ((sep (propertize
+;;                                                     (format " %s " "|")
+;;                                                     'face '(:foreground "dim gray" :background "#282c34")))
+;;                                               (date (propertize
+;;                                                      (format-time-string "%A, %d %B")
+;;                                                      'face '(:foreground "gray" :background "#282c34")))
+;;                                               (time (propertize
+;;                                                      (format-time-string "%H:%M")
+;;                                                      'face '(:foreground "gray" :background "#282c34")))
+;;                                               (volume-icon (propertize
+;;                                                             (format "%s" "")
+;;                                                             'face '(:foreground "gray" :background "#282c34" :height 110)))
+;;                                               (volume (propertize
+;;                                                        (format " %s " (bk/get-current-volume))
+;;                                                        'face '(:foreground "gray" :background "#282c34")))
+;;                                               (telega-icon (propertize
+;;                                                             (format "%s" "")
+;;                                                             'face '(:foreground "gray" :background "#282c34" :height 115)))
+;;                                               (telega-msg-count (propertize
+;;                                                                  (format " %s" (bk/telega-msg-count))
+;;                                                                  'face '(:foreground "gray" :background "#282c34")))
+;;                                               (persp (propertize
+;;                                                       (format "%s" (persp-current-name))
+;;                                                       'face '(:foreground "gray" :background "#282c34"))))
+;;                                           (concat
+;;                                            (propertize
+;;                                             (make-string (/ (- (frame-text-cols)
+;;                                                                (string-width (concat sep date sep time sep volume-icon volume sep telega-icon telega-msg-count sep persp sep)))
+;;                                                             2)
+;;                                                          ? ) 'face '(:background "#282c34"))
+;;                                            sep date sep time sep volume-icon volume sep telega-icon telega-msg-count sep persp sep)))))
+
+;; (setq-default minibuffer-line-format
+;;               '((:eval
+;;                  (let ((sep (format " %s " "|"))
+;;                        (date (format-time-string "%A, %d %B"))
+;;                        (time (format-time-string "%H:%M"))
+;;                        (volume-icon (format "%s" ""))
+;;                        (volume (format " %s " (bk/get-current-volume)))
+;;                        (telega-icon (format "%s" ""))
+;;                        (telega-msg-count (format " %s" (bk/telega-msg-count)))
+;;                        (persp (format "%s" (persp-current-name))))
+;;                    (concat
+;;                     (make-string (/ (- (frame-text-cols)
+;;                                        (string-width
+;;                                         (concat
+;;                                          sep date sep time sep volume-icon volume
+;;                                          sep telega-icon telega-msg-count sep persp sep)))
+;;                                     2)
+;;                                  ? )
+;;                     sep date sep time sep volume-icon volume sep telega-icon telega-msg-count sep persp sep)))))
+
+;; (setq-default minibuffer-line-format
+;;               '((:eval
+;;                  (let ((sep (format " %s " "|"))
+;;                        (date (format-time-string "%A, %d %B"))
+;;                        (time (format-time-string "%H:%M"))
+;;                        (volume-icon (format "%s" ""))
+;;                        (volume (format " %s " (bk/get-current-volume)))
+;;                        (telega-icon (format "%s" ""))
+;;                        (telega-msg-count (format " %s" (bk/telega-msg-count)))
+;;                        (persp (format "%s" (persp-current-name))))
+;;                    (concat
+;;                     (propertize
+;;                      (make-string (/ (- (frame-text-cols)
+;;                                         (string-width
+;;                                          (concat
+;;                                           sep date sep time sep volume-icon volume sep telega-icon telega-msg-count sep persp sep)))
+;;                                      2)
+;;                                   ? )
+;;                      'face '(:background "#28xc34"))
+;;                     sep date sep time sep volume-icon volume sep telega-icon telega-msg-count sep persp sep)))))
+
+(defun bk/info ()
+  (let ((sep
+         (propertize
+          (format " %s " "|")
+          'face '(:foreground "dim gray" :background "#282c34")))
+        (date
+         (propertize
+          (format-time-string "%A, %d %B")
+          'face '(:foreground "gray" :background "#282c34")))
+        (time
+         (propertize
+          (format-time-string "%H:%M")
+          'face '(:foreground "gray" :background "#282c34")))
+        (volume-icon
+         (propertize
+          (format "%s" "")
+          'face '(:foreground "gray" :background "#282c34" :height 110)))
+        (volume
+         (propertize
+          (format " %s " (bk/get-current-volume))
+          'face '(:foreground "gray" :background "#282c34")))
+        (telega-icon
+         (propertize
+          (format "%s" "")
+          'face '(:foreground "gray" :background "#282c34" :height 115)))
+        (telega-msg-count
+         (propertize
+          (format " %s" (bk/telega-msg-count))
+          'face '(:foreground "gray" :background "#282c34")))
+        (persp
+         (propertize
+          (format "%s" (persp-current-name))
+          'face '(:foreground "white" :background "#282c34"))))
+  (concat sep date sep time sep volume-icon volume sep telega-icon telega-msg-count sep persp sep)))
+
 (setq-default minibuffer-line-format
               '((:eval
                  (propertize
-                  (format "%s " "|")
-                  'face
-                  '(:foreground "dim gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format-time-string "%A, %d %B")
-                  'face
-                  '(:foreground "gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format " %s " "|")
-                  'face
-                  '(:foreground "dim gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format-time-string "%H:%M")
-                  'face
-                  '(:foreground "gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format " %s " "|")
-                  'face
-                  '(:foreground "dim gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format "%s" "")
-                  'face
-                  '(:foreground "gray" :background "#282c34" :height 110)))
-                (:eval
-                 (propertize
-                  (format " %s " (bk/get-current-volume))
-                  'face
-                  '(:foreground "gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format " %s " "|")
-                  'face
-                  '(:foreground "dim gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format "%s" "")
-                  'face
-                  '(:foreground "gray" :background "#282c34" :height 115)))
-                (:eval
-                 (propertize
-                  (format " %s" (bk/telega-msg-count))
-                  'face
-                  '(:foreground "gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format " %s " "|")
-                  'face
-                  '(:foreground "dim gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format "%s" (persp-current-name))
-                  'face
-                  '(:foreground "gray" :background "#282c34")))
-                (:eval
-                 (propertize
-                  (format " %s " "|")
-                  'face
-                  '(:foreground "dim gray" :background "#282c34")))
-                ))
+                  (make-string (/ (- (frame-text-cols) (string-width (bk/info))) 2) ? )
+                  'face '(:background "#282c34")))
+                (:eval (bk/info))))
+
+;; (setq-default minibuffer-line-format
+;;               '((:eval
+;;                  (propertize
+;;                   (format "%s " "|")
+;;                   'face
+;;                   '(:foreground "dim gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format-time-string "%A, %d %B")
+;;                   'face
+;;                   '(:foreground "gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format " %s " "|")
+;;                   'face
+;;                   '(:foreground "dim gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format-time-string "%H:%M")
+;;                   'face
+;;                   '(:foreground "gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format " %s " "|")
+;;                   'face
+;;                   '(:foreground "dim gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format "%s" "")
+;;                   'face
+;;                   '(:foreground "gray" :background "#282c34" :height 110)))
+;;                 (:eval
+;;                  (propertize
+;;                   (format " %s " (bk/get-current-volume))
+;;                   'face
+;;                   '(:foreground "gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format " %s " "|")
+;;                   'face
+;;                   '(:foreground "dim gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format "%s" "")
+;;                   'face
+;;                   '(:foreground "gray" :background "#282c34" :height 115)))
+;;                 (:eval
+;;                  (propertize
+;;                   (format " %s" (bk/telega-msg-count))
+;;                   'face
+;;                   '(:foreground "gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format " %s " "|")
+;;                   'face
+;;                   '(:foreground "dim gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format "%s" (persp-current-name))
+;;                   'face
+;;                   '(:foreground "gray" :background "#282c34")))
+;;                 (:eval
+;;                  (propertize
+;;                   (format " %s " "|")
+;;                   'face
+;;                   '(:foreground "dim gray" :background "#282c34")))
+;;                 ))
 
 (minibuffer-line-mode 1)
 #+end_src
@@ -1339,6 +1462,13 @@ top -bn1 | grep '%Cpu' | tail -1 | grep -P '(....|...) id,'|awk '{print "CPU Usa
 (defun bk/tor-browser ()
   (interactive)
   (start-process-shell-command "tor" nil "sh -c '/home/solus/.tor-browser/Browser/start-tor-browser' --detach"))
+
+(defun bk/notify-squats ()
+  (let ((count 1))
+    (while t
+      (sit-for 3600)
+      (notifications-notify :title (concat "Do Squads!!!" " " (number-to-string count) "th set"))
+      (setq count (1+ count)))))
 #+end_src
 
 ** updates workspaces
@@ -1540,6 +1670,8 @@ Hide the minibuffer and echo area.
   (let ((commands '("feh --randomize --bg-fill /run/media/solus/hdd/Pictures/wallpapers/*"
                     "picom --config ~/.config/picom.conf"
                     "setxkbmap -option caps:swapescape -layout us,ru -variant -option grp:alt_shift_toggle,grp_led:scroll"
+                    "dunst"
+                    "python3 ~/squad.py"
                     "./idea_new_ui/bin/idea.sh")))
                     ;; "./idea/bin/idea.sh")))
     (dolist (command commands)
@@ -1561,6 +1693,7 @@ Hide the minibuffer and echo area.
                            (bk/workspace-init)
                            (bk/run-shell-commands)
                            (bk/run-apps)
+                           ;;(bk/notify-squats)
                            ))
 #+end_src
 
