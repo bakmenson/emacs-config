@@ -1139,6 +1139,7 @@ folder, otherwise delete a word"
 #+begin_src emacs-lisp
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-rust)
+(require 'flycheck)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (setq flycheck-check-syntax-automatically '(save
                                             idle-change
