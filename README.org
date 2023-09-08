@@ -842,7 +842,7 @@ after first installation packaage all-the-icons =M-x: all-the-icons-install-font
 (customize-set-variable 'vertico-cycle t)
 
 (require 'vertico)
-(require 'vertico-directory "extensions/vertico-directory.el")
+;; (require 'vertico-directory "extensions/vertico-directory.el")
 
 (with-eval-after-load "evil"
   (define-key vertico-map (kbd "C-j") 'vertico-next)
