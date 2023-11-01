@@ -259,6 +259,12 @@
 (server-start)
 #+end_src
 
+** bell sound
+
+#+begin_src emacs-lisp
+;; (setq visible-bell nil)
+(setq ring-bell-function `ignore)
+#+end_src
 * Evil
 ** evil
 
@@ -357,6 +363,9 @@ after first installation packaage all-the-icons =M-x: all-the-icons-install-font
 
 (doom-themes-org-config)
 (load-theme 'doom-one t)
+
+;; (straight-use-package 'catppuccin-theme)
+;; (load-theme 'catppuccin :no-confirm)
 #+end_src
 
 ** modeline
