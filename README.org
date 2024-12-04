@@ -167,17 +167,17 @@
 (defun bk/set-font-faces ()
   (set-face-attribute 'default nil
                       :font "JetBrains Mono"
-                      :height 90
+                      :height 110
                       :weight 'normal)
 
   (set-face-attribute 'fixed-pitch nil
                       :font "JetBrains Mono"
-                      :height 90
+                      :height 110
                       :weight 'normal)
 
   (set-face-attribute 'variable-pitch nil
                       :font "JetBrains Mono"
-                      :height 90
+                      :height 110
                       :weight 'normal))
 #+end_src
 
